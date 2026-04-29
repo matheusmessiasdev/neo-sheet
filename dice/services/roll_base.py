@@ -5,19 +5,27 @@ from itertools import chain
 
 def roll_dice_formula(formula: str,
                       critical_value: int | None = None,
-                      critical_mult: int | None = 1):
+                      critical_mult: int | None = 1,
+                      drop: int = 0):
 
     dice, faces, operator, \
         operator_num, modifiers = _resolve_formula_extracting(formula=formula)
-    crit_flag = None
+
     modifier_total = _resolve_modifier(modifiers)
     rolls = [randbelow(faces) + 1 for _ in range(dice)]
     resolved_operator = resolve_operator(rolls, operator, operator_num, faces)
     rolls_total = sum(resolved_operator)
     fumble_flag = max(rolls) <= 1
+    crit_flag = (critical_value is not None) and max(
+        rolls) >= critical_value
+    for _ in range(drop):
+        if drop > dice:
+            print('é maior sim')
+            resolved_operator = []
+            break
+        print('é maior não')
 
-    if critical_value:
-        crit_flag = max(rolls) >= critical_value
+        resolved_operator.pop()
 
     return {"dice_notation":  formula,
             "rolls": rolls,
@@ -32,6 +40,7 @@ def roll_dice_formula(formula: str,
                 "faces": faces,
                 "critical_value": critical_value,
                 "critical_mult": critical_mult,
+                "dropped_dice": drop,
             },
             }
 
@@ -91,4 +100,4 @@ def _resolve_formula_extracting(formula: str) -> tuple[int, int,
 
 # TODO resolver erro que um + ou - pode passar sem ter numero de modificador
 if __name__ == '__main__':
-    print(roll_dice_formula('3d20kh1+5', 16))
+    print(roll_dice_formula('3d20kh2+5', 1, drop=1))
