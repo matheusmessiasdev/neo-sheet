@@ -18,14 +18,8 @@ def roll_dice_formula(formula: str,
     fumble_flag = max(rolls) <= 1
     crit_flag = (critical_value is not None) and max(
         rolls) >= critical_value
-    for _ in range(drop):
-        if drop > dice:
-            print('é maior sim')
-            resolved_operator = []
-            break
-        print('é maior não')
-
-        resolved_operator.pop()
+    resolved_operator = resolved_operator[:-
+                                          drop] if drop else resolved_operator
 
     return {"dice_notation":  formula,
             "rolls": rolls,
@@ -72,7 +66,6 @@ def resolve_operator(rolls: list[int], operator: str, operator_num: str, face: i
             return list(chain(explosive_rolls, rolls))
 
         case '':
-            print('Entro aqui!')
             return rolls
         case _:
             return list()
@@ -86,7 +79,7 @@ def _resolve_modifier(modifier: str):
 
 def _resolve_formula_extracting(formula: str) -> tuple[int, int,
                                                        str, str, str]:
-    pattern = r'^(\d+)?d(\d+)([a-z!]*)?(\d+)?(([+-]\d)*)$'
+    pattern = r'^(\d+)?d(\d+)([a-z!]*)?(\d+)?(([+-]\d+)*)$'
     re_match = re.fullmatch(pattern, formula)
     if not re_match:
         print('Formula Invalida')
@@ -100,4 +93,4 @@ def _resolve_formula_extracting(formula: str) -> tuple[int, int,
 
 # TODO resolver erro que um + ou - pode passar sem ter numero de modificador
 if __name__ == '__main__':
-    print(roll_dice_formula('3d20kh2+5', 1, drop=1))
+    print(roll_dice_formula('2000d20', 1, drop=1))
