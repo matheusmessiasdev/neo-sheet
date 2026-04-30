@@ -41,7 +41,7 @@ class RollDiceSerializer(serializers.Serializer):
     critical_mult = serializers.IntegerField(
         min_value=1, max_value=100, allow_null=True, default=1)
     drop = serializers.IntegerField(min_value=0,
-                                    max_value=999, allow_null=True, default=1)
+                                    max_value=999, allow_null=True, default=0)
 
 
 if __name__ == '__main__':
