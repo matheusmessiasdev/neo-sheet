@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+
+app_name = 'v1'
+
 urlpatterns = [
-    path('', views.roll_base_dice),
+    path('dice/rolls/base', views.roll_base_dice, name='roll_base'),
 ]
