@@ -19,7 +19,7 @@ def roll_dice_formula(formula: str,
     crit_flag = (critical_value is not None) and max(
         rolls) >= critical_value
     resolved_operator = resolved_operator[:-
-                                          drop] if drop else resolved_operator
+                                          drop] if drop > 0 else resolved_operator
 
     return {"dice_notation":  formula,
             "rolls": rolls,
@@ -64,7 +64,6 @@ def resolve_operator(rolls: list[int], operator: str, operator_num: str, face: i
             explosive_rolls = [
                 randbelow(face) + 1 for value in rolls if value == face]
             return list(chain(explosive_rolls, rolls))
-
         case '':
             return rolls
         case _:
@@ -74,7 +73,6 @@ def resolve_operator(rolls: list[int], operator: str, operator_num: str, face: i
 def _resolve_modifier(modifier: str):
     values = tuple(map(int, re.findall(r'([+-]\d*)', modifier)))
     return sum(values)
-    ...
 
 
 def _resolve_formula_extracting(formula: str) -> tuple[int, int,
@@ -91,6 +89,6 @@ def _resolve_formula_extracting(formula: str) -> tuple[int, int,
     return _dice, _faces, _operator, _operator_num, _modifiers
 
 
-# TODO resolver erro que um + ou - pode passar sem ter numero de modificador
 if __name__ == '__main__':
-    print(roll_dice_formula('2000d20', 1, drop=1))
+    print(roll_dice_formula('2d20'))
+    ...
