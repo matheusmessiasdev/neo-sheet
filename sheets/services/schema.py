@@ -6,7 +6,6 @@ BASE_SCHEMA_FIELDS = [
     "inventory",
     "spells",
     "defense",
-    "custom_fields",
     "abilities",
     "stacks",
     "corruption",
