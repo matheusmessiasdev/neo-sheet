@@ -6,14 +6,18 @@ from django.db import models
 class ProfileTemplate(models.Model):
     system_id = models.CharField(max_length=50, unique=True)
     display_name = models.CharField(max_length=100)
+    is_official = models.BooleanField(default=False)
 
     field_map = models.JSONField(default=dict)
-    active_fields = models.JSONField(default=dict)
-    inactive_fields = models.JSONField(default=dict)
+    active_fields = models.JSONField(default=list)
+    inactive_fields = models.JSONField(default=list)
     field_overrides = models.JSONField(default=dict)
+    custom_fields = models.JSONField(default=dict)
+
+    created_at = models.DateField(auto_now_add=True)
 
     class Meta:
-        ordering = ['system_id']
+        ordering = ['display_name']
     ...
 
     def __str__(self):

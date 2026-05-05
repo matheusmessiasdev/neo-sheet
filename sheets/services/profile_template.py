@@ -1,5 +1,5 @@
-from schema import BASE_SCHEMA_FIELDS
-PROFILE_TEMPLATE = {
+from .schema import BASE_SCHEMA_FIELDS
+PROFILE_TEMPLATE_SCHEMA = {
     "system_id": '',
     "display_name": '',
 
