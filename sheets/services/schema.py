@@ -7,7 +7,6 @@ BASE_SCHEMA_FIELDS = [
     "abilities",
     "spells",
     "inventory",
-    "stacks",
 ]
 
 
@@ -39,7 +38,8 @@ BASE_DEFENSE_SCHEMA = {
     "protection_value": 0,
     "bonus": 0,
     "total": 0,
-
+    "resistances": "",
+    "imunities": "",
 }
 
 BASE_SKILLS_SCHEMA = {
@@ -48,8 +48,6 @@ BASE_SKILLS_SCHEMA = {
     "proficiency_bonus": 0,
     "extra": 0,
     "total": 0,
-
-
 }
 
 BASE_ABILITIES_SCHEMA = {
@@ -57,7 +55,6 @@ BASE_ABILITIES_SCHEMA = {
     "cost": 0,
     "type": "",
     "description": "",
-
 }
 
 BASE_SPELLS_SCHEMA = {
@@ -66,7 +63,6 @@ BASE_SPELLS_SCHEMA = {
     "element": "",
     "type": "",
     "description": "",
-
 }
 
 BASE_INVENTORY_SCHEMA = {
@@ -85,7 +81,6 @@ BASE_SCHEMA_DEFAULTS = {
     "abilities": [BASE_ABILITIES_SCHEMA],
     "spells": [BASE_SPELLS_SCHEMA],
     "inventory": [BASE_INVENTORY_SCHEMA],
-    "stacks": None,
     "custom_fields": {},
 }
 

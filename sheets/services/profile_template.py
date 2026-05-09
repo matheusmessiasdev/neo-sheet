@@ -1,41 +1,186 @@
-from .schema import BASE_SCHEMA_FIELDS
-PROFILE_TEMPLATE_SCHEMA = {
-    "system_id": '',
-    "display_name": '',
 
-    "field_map": {
-        "_description": 'Map Base Fields to labels in your system.',
-        "_example": {
-            "spells": {'label': 'Rituals', 'key': 'spells'}
+PROFILE_TEMPLATE_SCHEMA = {
+    "system_id": "",
+    "display_name": "",
+    "base_schema_url": "/api/v1/base_schemas/",
+
+
+    "schemas": {
+        "_description": "The object templates for every aspect of your sheet. If default is false, you can use custom_schemas to create your own",
+
+        "identity_schema": {
+            "_description": "Your character's sheet information.",
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
         },
-    },
-    "active_fields": {
-        "_description": 'List avaliable fields in your  system.',
-        "_fields_avaliable": BASE_SCHEMA_FIELDS,
-        "_value": [],
-    },
-    "inactive_fields": {
-        "_description": 'List unavaliable fields in your  system.',
-        "_value": [],
-    },
-    "field_overrides": {
-        "_description": 'Redefine the internal structure of base fields.',
-        "_example": {
-            "defenses": {
-                "saving_throws": None
+        "attributes_schema": {
+            "_description": "Your system's attributes with limits.",
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "status_schema": {
+            "_description": "Your system's status (Life Points, Mana, Sanity).",
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "defense_schema": {
+            "_description": "Your system's defense and resistance values.",
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "skills_item_schema": {
+            "_description": "Your system's skills or similar variants.",
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "abilities_item_schema": {
+            "_description": "Your system's abilities and talents.",
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "spells_item_schema": {
+            "_description": "Your system's magic or similar variants.",
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "inventory_item_schema": {
+            "_description": "Your system's inventory.",
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "custom_fields": {
+            "_description": "Fields that does not exist in the base schema. Types: int, str, bool, object, list.",
+            "added_fields": {
+                "_mask": {
+                    "default": {"name": "", "bonus": 0},
+                    "abilities": {
+                        "name": "",
+                        "bonus": 0,
+                        "description": 0
+                    }
+                },
+                "_trauma_track": {
+                    "saving_tests": [False, False, False],
+                }
             }
         },
     },
-    "attributes_schema": {
-        "_description": "Declare your system's attributes with limits.",
-        "_example": {
-            "attributes": {"label": "Strength", "min": 0, "max": 30}
+}
+
+PROFILE_BLANK_SCHEMA = {
+    "system_id": "",
+    "display_name": "",
+    "base_schema_url": "/api/v1/base_schemas/",
+
+
+    "schemas": {
+        "identity_schema": {
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "attributes_schema": {
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "status_schema": {
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "defense_schema": {
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "skills_item_schema": {
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "abilities_item_schema": {
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "spells_item_schema": {
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "inventory_item_schema": {
+            "default": True,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {},
+        },
+        "custom_fields_schema": {
+            "added_fields": {
+                "_mask": {
+                    "default": {"name": "", "bonus": 0},
+                    "abilities": {
+                        "name": "",
+                        "bonus": 0,
+                        "description": 0
+                    }
+                },
+                "_trauma_track": {
+                    "saving_tests": [False, False, False],
+                }
+            }
         },
     },
-    "status_schema": {
-        "_description": "Declare your system's trackable resources with current/max.",
-        "_example": {
-            "health": {"label": "Life Points", "current": 0, "max": 100}
-        },
+}
+
+SCHEMAS_JSON_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "identity_schema": {"$ref": "#/$defs/section_schema"},
+        "attributes_schema": {"$ref": "#/$defs/section_schema"},
+        "status_schema": {"$ref": "#/$defs/section_schema"},
+        "defense_schema": {"$ref": "#/$defs/section_schema"},
+        "skills_item_schema": {"$ref": "#/$defs/section_schema"},
+        "abilities_item_schema": {"$ref": "#/$defs/section_schema"},
+        "spells_item_schema": {"$ref": "#/$defs/section_schema"},
+        "inventory_item_schema": {"$ref": "#/$defs/section_schema"},
+        "custom_fields_schema": {"$ref": "#/$defs/section_schema"}
     },
+    "additionalProperties": False,  # não permite seções extras não listadas
+    "$defs": {
+        "section_schema": {
+            "type": "object",
+            "properties": {
+                "default": {"type": "boolean"},
+                "added_fields": {"type": "object"},
+                "field_overrides": {"type": "object"},
+                "custom_schema": {"type": "object"}
+            },
+            "additionalProperties": False,
+            "default": {}  # se omitido, assume dicionário vazio
+        }
+    }
 }
