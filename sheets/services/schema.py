@@ -7,6 +7,7 @@ BASE_SCHEMA_FIELDS = [
     "abilities",
     "spells",
     "inventory",
+    "custom",
 ]
 
 
@@ -81,7 +82,7 @@ BASE_SCHEMA_DEFAULTS = {
     "abilities": [BASE_ABILITIES_SCHEMA],
     "spells": [BASE_SPELLS_SCHEMA],
     "inventory": [BASE_INVENTORY_SCHEMA],
-    "custom_fields": {},
+    "custom": {},
 }
 
 

@@ -139,23 +139,10 @@ PROFILE_BLANK_SCHEMA = {
             "custom_schema": {},
         },
         "custom_fields_schema": {
-            "added_fields": {
-                "_mask": {
-                    "default": {"name": "", "bonus": 0},
-                    "abilities": {
-                        "name": "",
-                        "bonus": 0,
-                        "description": 0
-                    }
-                },
-                "_trauma_track": {
-                    "saving_tests": [False, False, False],
-                }
-            }
+            "added_fields": {},
         },
-    },
+    }
 }
-
 SCHEMAS_JSON_SCHEMA = {
     "type": "object",
     "properties": {
@@ -180,7 +167,15 @@ SCHEMAS_JSON_SCHEMA = {
                 "custom_schema": {"type": "object"}
             },
             "additionalProperties": False,
-            "default": {}  # se omitido, assume dicionário vazio
+            "default": {},  # se omitido, assume dicionário vazio
+            "if": {
+                "properties": {"default": {"const": False}},
+                "required": ["default"]
+            },
+            "then": {
+                # exige custom_schema quando default=false
+                "required": ["custom_schema"]
+            }
         }
     }
 }
