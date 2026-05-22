@@ -8,24 +8,12 @@ base_fields_and_label = deepcopy(BASE_SCHEMA_FIELDS)
 base_fields_and_label.append('label')
 
 
-def configure_sheet_from_profile2(profile: ProfileModel):
-    sheet = BASE_SCHEMA_DEFAULTS
-    profile_schemas = profile.schemas
-    print(profile_schemas)
-    for key, schema in profile_schemas.items():
-        key_schema_list = [
-            (key, item) for item in BASE_SCHEMA_FIELDS if re.search(item, key)]
-    for items in key_schema_list:
-        key,
-    ...
-
-
 def configure_sheet_from_profile(profile: ProfileModel):
     sheet = BASE_SCHEMA_DEFAULTS
     profile_schemas = profile.schemas
     profile_schemas_keys = profile_schemas.keys()
     PATTERN = r'^([^_]+)'
-
+    is_field_a_list = False
     RE_MATCH = [re.search(PATTERN, key).group(1)
                 for key in profile_schemas_keys if re.search(PATTERN, key)]
     profile_field_schema_pair = list(zip(RE_MATCH, profile_schemas_keys))
@@ -37,15 +25,23 @@ def configure_sheet_from_profile(profile: ProfileModel):
         print(default_field, 'antes')
 
         if not schema_default and schema_default is not None:
+            if isinstance(default_field, list):
+                is_field_a_list = True
             print(schema_default, 'VALOR DE DEFAULT')
             default_field = schema.get('custom_schema')
             new_default_field = strip_metadata(default_field)
             print(default_field, 'depois')
+            if is_field_a_list:
+                item_field = list()
+                item_field.append(new_default_field)
+                sheet[field] = item_field
+                print(item_field)
+                print(sheet[field])
+                continue
             sheet[field] = new_default_field
 
         # Lists are set to get the base schema from template
         if isinstance(default_field, list):
-            list_field = default_field
             default_field = default_field[0]
 
         if schema.get('added_fields'):
@@ -57,8 +53,15 @@ def configure_sheet_from_profile(profile: ProfileModel):
             new_field_overrides = strip_metadata(schema.get('field_overrides'))
             for field, field_value in new_field_overrides.items():
                 if field_value:
-                    default_field.update(new_field_overrides)
+                    default_field.update({field: field_value})
                     continue
+                elif field_value is None:
+                    default_field.pop(field)
+                # elif field_value is None:
+                #     print(field, field_value, field_value is None)
+                #     removed = default_field.pop(field)
+                #     print(removed)
+                #     continue
 
                 # default_field.pop(field)
     print('FINAL SHEET')
