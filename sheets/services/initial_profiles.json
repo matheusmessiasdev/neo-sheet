@@ -1,0 +1,109 @@
+{
+    "system_id": "paranormal_order",
+    "display_name": "Paranormal Order",
+    "base_schema_url": "/api/v1/base_schemas/",
+    "schemas": {
+        "identity_schema": {
+            "default": false,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {
+                "name": "",
+                "level": 0,
+                "nex": 0,
+                "origin": "",
+                "class": ""
+            }
+        },
+        "attributes_schema": {
+            "default": false,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {
+                "dex": 0,
+                "con": 0,
+                "int": 0,
+                "str": 0,
+                "pre": 0
+            }
+        },
+        "status_schema": {
+            "default": true,
+            "added_fields": {
+                "effort": {
+                    "current": 0,
+                    "max": 0,
+                    "temporary": 0
+                },
+                "determination": {
+                    "current": 0,
+                    "max": 0,
+                    "temporary": 0
+                }
+            },
+            "field_overrides": {
+                "health": {
+                    "current": 0,
+                    "max": 0,
+                    "temporary": 0
+                },
+                "sanity": {
+                    "current": 0,
+                    "max": 0,
+                    "temporary": 0
+                },
+                "stamina": null
+            },
+            "custom_schema": {}
+        },
+        "defense_schema": {
+            "default": true,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {}
+        },
+        "skills_item_schema": {
+            "default": true,
+            "added_fields": {
+                "temporary": 0
+            },
+            "field_overrides": {},
+            "custom_schema": {}
+        },
+        "abilities_item_schema": {
+            "default": true,
+            "added_fields": {
+                "class": ""
+            },
+            "field_overrides": {},
+            "custom_schema": {}
+        },
+        "spells_item_schema": {
+            "default": true,
+            "added_fields": {},
+            "field_overrides": {},
+            "custom_schema": {}
+        },
+        "inventory_item_schema": {
+            "default": true,
+            "added_fields": {
+                "item_type": 0,
+                "weapon_values": {},
+                "_weapon_values_example": {
+                    "damage": "",
+                    "damage_type": "",
+                    "critical_range": 0,
+                    "critical_mult": 0,
+                    "handling": "",
+                    "proficiency": ""
+                },
+                "category": 0,
+                "mods": [],
+                "tag": 0
+            },
+            "field_overrides": {},
+            "custom_schema": {}
+        },
+        "custom_fields": {}
+    }
+}

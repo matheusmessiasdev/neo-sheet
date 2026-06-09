@@ -13,8 +13,8 @@ def check_profile_default(data):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    schemas = serializers.JSONField(default=dict, validators=[
-                                    JsonSchemaFieldValidator(schema=SCHEMAS_JSON_SCHEMA)])
+    schemas = serializers.JSONField(default=dict,
+                                    validators=[JsonSchemaFieldValidator(schema=SCHEMAS_JSON_SCHEMA)])
 
     class Meta:
         model = ProfileModel

@@ -56,14 +56,10 @@ def configure_sheet_from_profile(profile: ProfileModel):
                     default_field.update({field: field_value})
                     continue
                 elif field_value is None:
-                    default_field.pop(field)
-                # elif field_value is None:
-                #     print(field, field_value, field_value is None)
-                #     removed = default_field.pop(field)
-                #     print(removed)
-                #     continue
+                    print(f'APAGAR FIELD {field}')
+                    print(f'APAGAR ESSE FIELD {default_field.get(field)}')
+                    default_field.pop(field, None)
 
-                # default_field.pop(field)
     print('FINAL SHEET')
     print('FINAL SHEET')
     print('FINAL SHEET')

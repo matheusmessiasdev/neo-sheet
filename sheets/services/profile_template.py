@@ -86,7 +86,6 @@ PROFILE_TEMPLATE_SCHEMA = {
 PROFILE_BLANK_SCHEMA = {
     "system_id": "",
     "display_name": "",
-    "base_schema_url": "/api/v1/base_schemas/",
 
 
     "schemas": {

@@ -61,6 +61,9 @@ BASE_ABILITIES_SCHEMA = {
 BASE_SPELLS_SCHEMA = {
     "name": "",
     "cost": 0,
+    "casting_time": "",
+    "range_area": "",
+    "duration": "",
     "element": "",
     "type": "",
     "description": "",
