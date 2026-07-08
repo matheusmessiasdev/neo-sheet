@@ -49,15 +49,13 @@ def resolve_operator(rolls: list[int], operator: str, operator_num: str, face: i
         sorted_rolls = sorted(rolls, reverse=ascending)
         if not operator_num or operator_num == '1':
             return [sorted_rolls[FIRST_ELEMENT]]
-        elif int(operator_num) > 1:
+        elif int_operator_num > 1:
             return sorted_rolls[FIRST_ELEMENT:int_operator_num]
-        else:
-            return rolls
+        return rolls
 
     match operator:
         case 'kh':
             return _handle_keep_drop(True)
-            # TODO use the operator num to determine how many will be kept
         case 'kl':
             return _handle_keep_drop(False)
         case '!':

@@ -12,7 +12,7 @@ import re
 @api_view(['POST'])
 def roll_base_dice(request):
     """
-    Rolls dices based of the dice notation (XdY). 
+    Rolls dices based of the dice notation (XdY).
     Compatible with Operators (kh, kl, !).
     """
 

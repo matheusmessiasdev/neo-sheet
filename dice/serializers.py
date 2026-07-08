@@ -10,11 +10,12 @@ def validate_dice_notation(formula: str):
     pattern = r'^(\d+)?d(\d+)([a-z!]*)?(\d+)?(([+-]\d+)*)$'
     re_match = re.fullmatch(pattern, formula.replace(" ", ""))
 
+    VALID_OPERATORS = {'kh', '!', 'kl', ''}
+
     if not re_match:
         raise serializers.ValidationError(
             f"Invalid Formula: {formula}. Use the XdY+modifier format. Ex: 3d6+5"
         )
-    VALID_OPERATORS = {'kh', '!', 'kl', ''}
     dice_amount = int(re_match.group(1))
     faces = int(re_match.group(2))
     operator = re_match.group(3)

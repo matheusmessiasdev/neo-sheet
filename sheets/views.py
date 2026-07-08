@@ -14,7 +14,7 @@ from jsonschema import validate
 
 
 @api_view(['GET'])
-def blank_sheet(request):
+def generic_sheet(request):
     """
     Base Schema that is returned from the profiles created.
     """
@@ -34,15 +34,32 @@ def blank_profile(request):
     ...
 
 
-class ProfilesList(generics.ListAPIView):
+class ProfilesList(generics.ListCreateAPIView):
     """
-    List of profiles avaliable.
+    List of system profiles avaliable.
     """
+    http_method_names = ["get", "post", "patch", "delete"]
+    serializer_class = ProfilesSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return ProfileSerializer
+        else:
+            return ProfilesSerializer
 
     def get_queryset(self):
         return ProfileModel.objects.all().only('system_id', 'display_name')
-    serializer_class = ProfilesSerializer
-    ...
+
+    def create(self, request: HttpRequest):
+        request_data = request.data
+        serializer = ProfileSerializer(data=request_data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=422)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        ...
 
 
 @api_view(['GET'])
@@ -67,17 +84,4 @@ def profile_template(request):
     Profile template to auxiliate it's creation.
     """
     return Response(PROFILE_TEMPLATE_SCHEMA, status=status.HTTP_200_OK)
-    ...
-
-
-@api_view(['POST'])
-def profiles(request: HttpRequest):
-    request_data = request.data
-    serializer = ProfileSerializer(data=request_data)
-
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=422)
-    serializer.save()
-
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
     ...
