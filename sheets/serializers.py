@@ -1,9 +1,9 @@
 from drf_jsonschema.validators import JsonSchemaFieldValidator
 from rest_framework import serializers
 from .models import ProfileModel
-from .services.schema import BASE_SCHEMA_DEFAULTS, BASE_SCHEMA_FIELDS
+# from .services.schema import BASE_SCHEMA_DEFAULTS, BASE_SCHEMA_FIELDS
 from .services.profile_template import PROFILE_TEMPLATE_SCHEMA, SCHEMAS_JSON_SCHEMA
-from copy import deepcopy
+from .services.resolved_schemas import resolve_schemas
 
 
 def check_profile_default(data):
@@ -20,8 +20,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = ProfileModel
         fields = ['system_id', 'display_name', 'schemas',]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['schemas'] = resolve_schemas(instance.schemas)
+        return data
 
-class ProfilesSerializer(serializers.ModelSerializer):
+
+class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileModel
         fields = ['system_id', 'display_name',]
