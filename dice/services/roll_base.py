@@ -4,7 +4,7 @@ from itertools import chain
 
 
 def roll_dice_formula(formula: str,
-                      critical_value: int | None = None,
+                      critical_value: int | None = 20,
                       critical_mult: int | None = 1,
                       drop: int = 0):
 
@@ -14,12 +14,13 @@ def roll_dice_formula(formula: str,
     modifier_total = _resolve_modifier(modifiers)
     rolls = [randbelow(faces) + 1 for _ in range(dice)]
     resolved_operator = resolve_operator(rolls, operator, operator_num, faces)
-    rolls_total = sum(resolved_operator)
     fumble_flag = max(rolls) <= 1
-    crit_flag = (critical_value is not None) and max(
-        rolls) >= critical_value
+    if critical_value is None or critical_value > faces:
+        critical_value = faces
+    crit_flag = max(rolls) >= critical_value
     resolved_operator = resolved_operator[:-
                                           drop] if drop > 0 else resolved_operator
+    rolls_total = sum(resolved_operator)
 
     return {"dice_notation":  formula,
             "rolls": rolls,

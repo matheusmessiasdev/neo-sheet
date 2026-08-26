@@ -24,6 +24,7 @@ def roll_base_dice(request):
     data = serializer.validated_data
     formula = data['formula']
     critical_value = data['critical_value']
+    print(data['critical_value'])
     critical_mult = data['critical_mult']
     drop = data['drop']
 

@@ -2,7 +2,7 @@
 PROFILE_TEMPLATE_SCHEMA = {
     "system_id": "",
     "display_name": "",
-    "base_schema_url": "/api/v1/base_schemas/",
+    "base_schema_url": "/api/v1/generic_sheet/",
 
 
     "schemas": {
@@ -137,7 +137,7 @@ PROFILE_BLANK_SCHEMA = {
             "field_overrides": {},
             "custom_schema": {},
         },
-        "custom_fields_schema": {
+        "custom_fields": {
             "added_fields": {},
         },
     }
@@ -153,7 +153,7 @@ SCHEMAS_JSON_SCHEMA = {
         "abilities_item_schema": {"$ref": "#/$defs/section_schema"},
         "spells_item_schema": {"$ref": "#/$defs/section_schema"},
         "inventory_item_schema": {"$ref": "#/$defs/section_schema"},
-        "custom_fields_schema": {"$ref": "#/$defs/section_schema"}
+        "custom_fields": {"$ref": "#/$defs/section_schema"}
     },
     "additionalProperties": False,  # não permite seções extras não listadas
     "$defs": {

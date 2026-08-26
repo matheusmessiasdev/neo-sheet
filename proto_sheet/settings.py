@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'rest_framework',
+    'djoser',
     'dice',
     'sheets',
     'accounts',
@@ -123,6 +125,27 @@ STATIC_URL = 'static/'
 
 REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'DEFAULT_VERSION': 'v1',
-    'ALLOWED_VERSIONS': ['v1']
+    'ALLOWED_VERSIONS': ['v1'],
 }
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT', 'Bearer'),
+}
+
+DJOSER = {
+    'TOKEN_MODEL': None,
+}
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {'console': {'class': 'logging.StreamHandler'}},
+    'loggers': {
+        'django.request': {'handlers': ['console'], 'level': 'DEBUG'},
+    },
+}
+
+TEST_RUNNER = 'pytest'

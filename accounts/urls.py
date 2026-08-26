@@ -1,10 +1,11 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from rest_framework import routers
 
-app_name = 'all_users'
+# app_name = 'all_users'
 
-router = routers.DefaultRouter()
-router.register(r'users', views.UsersViewSet)
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
+]

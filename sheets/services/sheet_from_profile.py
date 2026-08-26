@@ -65,6 +65,7 @@ def configure_sheet_from_profile(profile: ProfileModel):
     print('FINAL SHEET')
     print('FINAL SHEET')
     print(sheet)
+    return (sheet)
     ...
 
     ...
