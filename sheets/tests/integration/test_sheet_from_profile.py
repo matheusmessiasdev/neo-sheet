@@ -40,7 +40,7 @@ class TestConfigureSheetFromProfile:
         return deepcopy(BASE_SCHEMA_DEFAULTS)
 
     def test_no_modifications(self):
-        """Perfil sem modificações retorna a base."""
+        """Profiles without modification return base schema."""
         profile = ProfileFactory(schemas={})
         sheet = configure_sheet_from_profile(profile)
         expected = strip_metadata(deepcopy(BASE_SCHEMA_DEFAULTS))
@@ -56,10 +56,9 @@ class TestConfigureSheetFromProfile:
         profile = ProfileFactory(schemas=modifications)
         sheet = configure_sheet_from_profile(profile)
         assert sheet['identity']['title'] == ''
-        # Metadados (se houver) devem ser removidos
 
     def test_with_field_overrides_substitution(self):
-        """Substitui completamente um campo (level) por um objeto."""
+        """Overrides a field (level) completely for an object."""
         modifications = {
             'identity_schema': {
                 'field_overrides': {'level': {'label': 'Rank'}}
@@ -67,11 +66,10 @@ class TestConfigureSheetFromProfile:
         }
         profile = ProfileFactory(schemas=modifications)
         sheet = configure_sheet_from_profile(profile)
-        # O campo level deve ser o objeto {'label': 'Rank'}
         assert sheet['identity']['level'] == {'label': 'Rank'}
 
     def test_with_custom_schema_for_dict(self):
-        """Substitui completamente uma seção por custom_schema."""
+        """Overrides completely a section by custom_schema."""
         modifications = {
             'attributes_schema': {
                 'default': False,
@@ -80,11 +78,10 @@ class TestConfigureSheetFromProfile:
         }
         profile = ProfileFactory(schemas=modifications)
         sheet = configure_sheet_from_profile(profile)
-        # attributes deve ser o custom_schema limpo
         assert sheet['attributes'] == {'forca': 0, 'destreza': 0}
 
     def test_with_custom_schema_for_list(self):
-        """Substitui completamente uma seção que originalmente é lista."""
+        """Overrides completely a section that is initially a list."""
         modifications = {
             'abilities_item_schema': {
                 'default': False,
@@ -93,12 +90,11 @@ class TestConfigureSheetFromProfile:
         }
         profile = ProfileFactory(schemas=modifications)
         sheet = configure_sheet_from_profile(profile)
-        # abilities deve ser uma lista contendo o custom_schema
         assert isinstance(sheet['abilities'], list)
         assert sheet['abilities'][0] == {'name': '', 'cooldown': 0}
 
     def test_added_fields_to_list_item(self):
-        """Adiciona campos a um item de lista (inventory)."""
+        """Add field to an item list (inventory)."""
         modifications = {
             'inventory_item_schema': {
                 'added_fields': {'quantity': 1}
@@ -106,13 +102,12 @@ class TestConfigureSheetFromProfile:
         }
         profile = ProfileFactory(schemas=modifications)
         sheet = configure_sheet_from_profile(profile)
-        # Cada item de inventory deve ter o campo quantity
         for item in sheet['inventory']:
             assert 'quantity' in item
             assert item['quantity'] == 1
 
     def test_field_overrides_with_null_removes_field(self):
-        """field_overrides com None remove o campo da base."""
+        """field_overrides with None removes the field from base."""
         modifications = {
             'identity_schema': {
                 'field_overrides': {'experience': None}
@@ -120,11 +115,10 @@ class TestConfigureSheetFromProfile:
         }
         profile = ProfileFactory(schemas=modifications)
         sheet = configure_sheet_from_profile(profile)
-        # O campo experience não deve estar presente em identity
         assert 'experience' not in sheet['identity']
 
     def test_metadata_removal_at_all_levels(self):
-        """Metadados (_*) são removidos em todos os níveis."""
+        """Metadata (_*) are removed across all levels."""
         modifications = {
             'identity_schema': {
                 'added_fields': {

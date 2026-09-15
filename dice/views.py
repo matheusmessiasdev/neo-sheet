@@ -2,13 +2,27 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from secrets import randbelow
-from .serializers import RollDiceSerializer
+from .serializers import RollDiceSerializer, RollDiceResponseSerializer
 from .services.roll_base import roll_dice_formula
+from drf_spectacular.utils import extend_schema
 import re
 # Create your views here.
 
 
-# xdY
+@extend_schema(
+    tags=['Dice'],
+    summary='Roll Dice',
+    auth=[],
+    description=(
+        'Rolls dice based on XdY notation (ex: 2d6, 3d8+5).\n'
+        'Supports operators:\n'
+        '- `kh` (keep highest): 4d6kh3\n'
+        '- `kl` (keep lowest): 4d6kl2\n'
+        '- `!` (explosive): 3d6!\n'
+    ),
+    request=RollDiceSerializer,
+    responses={200: RollDiceResponseSerializer},
+)
 @api_view(['POST'])
 def roll_base_dice(request):
     """

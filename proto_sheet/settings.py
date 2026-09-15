@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'drf_spectacular',
     'rest_framework',
     'djoser',
     'dice',
@@ -130,10 +131,11 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_VERSION': 'v1',
     'ALLOWED_VERSIONS': ['v1'],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('JWT', 'Bearer'),
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 DJOSER = {
@@ -149,3 +151,21 @@ LOGGING = {
 }
 
 TEST_RUNNER = 'pytest'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Neo-Sheet',
+    'VERSION': '1.0.0',
+    'DESCRIPTION': 'A RESTful API for building and managing custom RPG character sheets.',
+    'POSTPROCESSING_HOOKS': [
+        'accounts.schema_hooks.fix_djoser_security',
+    ],
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY_DEFINITIONS': {
+        'BearerAuth': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'JWT Authorization header. Exemplo: "Bearer {token}"',
+        },
+    },
+}

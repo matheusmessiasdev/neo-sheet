@@ -155,7 +155,7 @@ SCHEMAS_JSON_SCHEMA = {
         "inventory_item_schema": {"$ref": "#/$defs/section_schema"},
         "custom_fields": {"$ref": "#/$defs/section_schema"}
     },
-    "additionalProperties": False,  # não permite seções extras não listadas
+    "additionalProperties": False,
     "$defs": {
         "section_schema": {
             "type": "object",
@@ -166,13 +166,13 @@ SCHEMAS_JSON_SCHEMA = {
                 "custom_schema": {"type": "object"}
             },
             "additionalProperties": False,
-            "default": {},  # se omitido, assume dicionário vazio
+            "default": {},
             "if": {
                 "properties": {"default": {"const": False}},
                 "required": ["default"]
             },
             "then": {
-                # exige custom_schema quando default=false
+
                 "required": ["custom_schema"]
             }
         }

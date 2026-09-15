@@ -26,19 +26,15 @@ class TestSheetGeneration:
                       kwargs={'system_id': profile.system_id})
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        # A resposta deve conter a ficha gerada (sem metadados)
         sheet = response.data
         assert 'identity' in sheet
         assert 'title' in sheet['identity']
-        # Verifica que metadados foram removidos (ex: _*)
         assert not any(key.startswith('_') for key in sheet['identity'].keys())
 
-# TODO deixar tudo isolado com APIClient
     def test_sheet_from_profile_unauthorized(self, api_client, authenticated_client):
         """Usuário não pode gerar ficha de perfil que não possui."""
         User = get_user_model()
         client, user = authenticated_client
-        # Cria perfil de outro usuário
         other_user = get_user_model().objects.create_user(username='other')
         other_profile = ProfileModel.objects.create(
             user=other_user,
@@ -47,14 +43,12 @@ class TestSheetGeneration:
         )
         url = reverse('v1:profile-sheet-from-profile',
                       kwargs={'system_id': other_profile.system_id})
-        # Outro usuário tenta acessar
         other_user1 = User.objects.create_user(
             username='other1', password='pass')
         other_client = APIClient()
         other_client.force_authenticate(user=other_user1)
         response = other_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        # Anônimo também não
         anon_client = APIClient()
         response = anon_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND

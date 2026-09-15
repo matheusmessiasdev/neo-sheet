@@ -1,4 +1,3 @@
-# accounts/tests/integration/test_auth_api.py
 import pytest
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -11,11 +10,10 @@ User = get_user_model()
 
 @pytest.mark.django_db(transaction=True)
 class TestAuthAPI:
-    """Testes de integração para endpoints de autenticação (djoser + JWT)."""
+    """Integration tests for authentication endpoints (djoser + JWT)."""
 
-    # ========== REGISTRO (user-list) ==========
     def test_user_registration_success(self, api_client):
-        """Registro com dados válidos retorna 201."""
+        """Registration with valid data returns 201."""
         url = reverse('v1:user-list')
         data = {
             'username': 'newuser',
@@ -30,16 +28,18 @@ class TestAuthAPI:
         assert 'password' not in response.data
 
     def test_user_registration_missing_fields(self, api_client):
-        """Registro com campos faltando retorna 400."""
+        """Registration with valid data returns 201."""
         url = reverse('v1:user-list')
-        data = {'username': 'newuser'}  # falta email e password
+
+        data = {'username': 'newuser'}
+
         response = api_client.post(url, data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'email' in response.data
         assert 'password' in response.data
 
     def test_user_registration_duplicate_username(self, api_client):
-        """Registro com username duplicado retorna 400."""
+        """Registration with duplicate username returns 400."""
         existing_user = UserFactory(username='existing')
         url = reverse('v1:user-list')
         data = {
@@ -52,7 +52,7 @@ class TestAuthAPI:
         assert 'username' in response.data
 
     def test_user_registration_duplicate_email(self, api_client):
-        """Registro com email duplicado retorna 400."""
+        """Registration with duplicate username returns 400."""
         existing_user = UserFactory(email='existing@example.com')
         url = reverse('v1:user-list')
         data = {
@@ -65,24 +65,23 @@ class TestAuthAPI:
         assert 'email' in response.data
 
     def test_user_registration_weak_password(self, api_client):
-        """Registro com senha fraca retorna 400."""
+        """Registration with weak password returns 400."""
         url = reverse('v1:user-list')
         data = {
             'username': 'newuser',
             'email': 'new@example.com',
-            'password': '123'  # muito curta
+            'password': '123'
         }
         response = api_client.post(url, data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'password' in response.data
 
-    # ========== LOGIN (JWT) ==========
     def test_login_success(self, api_client):
-        """Login com credenciais válidas retorna tokens."""
+        """Login with valid credentials returns tokens."""
         user = UserFactory()
         user.set_password('StrongPass123!')
         user.save()
-        url = reverse('v1:jwt-create')  # nome padrão do djoser para JWT
+        url = reverse('v1:jwt-create')
         data = {
             'username': user.username,
             'password': 'StrongPass123!'
@@ -93,7 +92,7 @@ class TestAuthAPI:
         assert 'refresh' in response.data
 
     def test_login_invalid_username(self, api_client):
-        """Login com username incorreto retorna 401."""
+        """Login with incorrect username returns 401."""
         url = reverse('v1:jwt-create')
         data = {
             'username': 'inexistente',
@@ -104,7 +103,7 @@ class TestAuthAPI:
         assert 'detail' in response.data
 
     def test_login_invalid_password(self, api_client):
-        """Login com senha incorreta retorna 401."""
+        """Login with incorrect password returns 401.."""
         user = UserFactory(username='testuser')
         user.set_password('StrongPass123!')
         user.save()
@@ -116,9 +115,8 @@ class TestAuthAPI:
         response = api_client.post(url, data, format='json')
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    # ========== REFRESH TOKEN ==========
     def test_refresh_success(self, api_client):
-        """Refresh com token válido retorna novo access."""
+        """Refresh with valid token returns new access token."""
         user = UserFactory()
         login_url = reverse('v1:jwt-create')
         data = {'username': user.username, 'password': 'Test@1234'}
@@ -132,15 +130,14 @@ class TestAuthAPI:
         assert 'access' in response.data
 
     def test_refresh_invalid_token(self, api_client):
-        """Refresh com token inválido retorna 401."""
+        """Refresh with invalid token returns 401."""
         url = reverse('v1:jwt-refresh')
         response = api_client.post(
             url, {'refresh': 'invalid_token'}, format='json')
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    # ========== VERIFY TOKEN ==========
     def test_verify_valid_token(self, api_client):
-        """Verificação de token válido retorna 200."""
+        """Verification of valid token returns 200."""
         user = UserFactory()
         login_url = reverse('v1:jwt-create')
         data = {'username': user.username, 'password': 'Test@1234'}
@@ -153,14 +150,13 @@ class TestAuthAPI:
         assert response.status_code == status.HTTP_200_OK
 
     def test_verify_invalid_token(self, api_client):
-        """Verificação de token inválido retorna 401."""
+        """Verification of invalid token returns 401."""
         url = reverse('v1:jwt-verify')
         response = api_client.post(url, {'token': 'invalid'}, format='json')
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    # ========== PERFIL DO USUÁRIO (user-me) ==========
     def test_me_authenticated(self, api_client):
-        """Usuário autenticado obtém seu perfil."""
+        """Authenticated user retrieves their profile."""
         user = UserFactory()
         login_url = reverse('v1:jwt-create')
         data = {'username': user.username, 'password': 'Test@1234'}
@@ -175,14 +171,13 @@ class TestAuthAPI:
         assert response.data['username'] == user.username
 
     def test_me_unauthenticated(self, api_client):
-        """Usuário não autenticado não obtém perfil."""
+        """Unauthenticated user cannot retrieve profile."""
         me_url = reverse('v1:user-me')
         response = api_client.get(me_url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    # ========== ATUALIZAR PERFIL (user-me via PATCH) ==========
     def test_me_update_success(self, api_client):
-        """Usuário autenticado atualiza seu perfil."""
+        """Authenticated user updates their profile."""
         user = UserFactory()
         login_url = reverse('v1:jwt-create')
         data = {'username': user.username, 'password': 'Test@1234'}
@@ -199,15 +194,14 @@ class TestAuthAPI:
         assert user.email == 'updated@example.com'
 
     def test_me_update_unauthenticated(self, api_client):
-        """Usuário não autenticado não atualiza perfil."""
+        """Unauthenticated user cannot update profile."""
         me_url = reverse('v1:user-me')
         response = api_client.patch(
             me_url, {'email': 'updated@example.com'}, format='json')
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    # ========== ALTERAR SENHA (user-set-password) ==========
     def test_set_password_success(self, api_client):
-        """Usuário autenticado altera senha com dados válidos."""
+        """Authenticated user changes password with valid data."""
         user = UserFactory()
         user.set_password('OldPass123!')
         user.save()
@@ -225,7 +219,7 @@ class TestAuthAPI:
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_set_password_invalid_current(self, api_client):
-        """Usuário autenticado com senha atual incorreta retorna 400."""
+        """Authenticated user with incorrect current password returns 400."""
         user = UserFactory()
         user.set_password('OldPass123!')
         user.save()
@@ -243,7 +237,7 @@ class TestAuthAPI:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_set_password_unauthenticated(self, api_client):
-        """Usuário não autenticado não altera senha."""
+        """Unauthenticated user cannot change password."""
         url = reverse('v1:user-set-password')
         response = api_client.post(url, {
             'current_password': 'OldPass123!',
@@ -251,35 +245,26 @@ class TestAuthAPI:
         }, format='json')
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    # ========== RESET DE SENHA (se configurado) ==========
-    # Os endpoints estão disponíveis, mas podem exigir envio de email.
-    # Vamos testar apenas a validação básica.
     def test_reset_password_request(self, api_client):
-        """Solicitação de reset de senha com email válido retorna 204 (ou 400 se sem email)."""
+        """Password reset request with valid email returns 204 (or 400 if no email)."""
         user = UserFactory(email='user@example.com')
         url = reverse('v1:user-reset-password')
-        # Dependendo da configuração, pode retornar 204 ou 400 se o email não for enviado.
-        # Vamos enviar um email válido.
         response = api_client.post(
             url, {'email': 'user@example.com'}, format='json')
-        # O djoser retorna 204 se o email for enviado (ou se a configuração estiver ok)
         assert response.status_code in [
             status.HTTP_204_NO_CONTENT, status.HTTP_400_BAD_REQUEST]
 
     def test_reset_password_invalid_email(self, api_client):
-        """Solicitação de reset com email inexistente retorna 400 (ou 204)."""
+        """Password reset request with non-existent email returns 400 (or 204)."""
         url = reverse('v1:user-reset-password')
         response = api_client.post(
             url, {'email': 'inexistente@example.com'}, format='json')
-        # O djoser pode retornar 204 mesmo para emails inexistentes (por segurança)
-        # Mas geralmente retorna 400 se o campo não for enviado.
-        # Vamos apenas verificar que não é 500.
+
         assert response.status_code in [
             status.HTTP_204_NO_CONTENT, status.HTTP_400_BAD_REQUEST]
 
-    # ========== CONFIRMAR RESET DE SENHA ==========
     def test_reset_password_confirm_invalid_token(self, api_client):
-        """Confirmar reset com token inválido retorna 400."""
+        """Password reset confirmation with invalid token returns 400."""
         url = reverse('v1:user-reset-password-confirm')
         response = api_client.post(url, {
             'uid': 'invalid',

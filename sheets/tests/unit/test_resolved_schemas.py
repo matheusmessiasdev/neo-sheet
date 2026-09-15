@@ -49,9 +49,6 @@ class TestResolveSchemas:
             }
         }
         result = resolve_schemas(modifications)
-        # A seção attributes_schema deve conter apenas o custom_schema
-
-        print(f'Result: {result}')
 
         assert result['attributes_schema']['custom_schema'] == {
             'forca': 0, 'destreza': 0}
@@ -66,7 +63,6 @@ class TestResolveSchemas:
             'inventory_item_schema': {'added_fields': {'quantity': 1}}
         }
         result = resolve_schemas(modifications)
-        print(result)
         assert result['identity_schema']['added_fields']['title'] == ''
         assert result['status_schema']['field_overrides']['health'] == {
             'max': 200}

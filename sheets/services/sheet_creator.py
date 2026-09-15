@@ -1,3 +1,0 @@
-def create_sheet(system_id):
-
-    ...

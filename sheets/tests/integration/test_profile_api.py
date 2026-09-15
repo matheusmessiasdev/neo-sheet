@@ -33,9 +33,8 @@ class TestProfileAPI:
         assert private.system_id not in response_system_ids
 
     def test_list_authenticated_views_official_and_own(self, authenticated_client, official_profile):
-        """Usuário autenticado vê oficiais + seus próprios perfis."""
+        """Authenticated user see official profiles + their own profiles."""
         client, user = authenticated_client
-        # Cria um perfil privado para o usuário
         private_profile = ProfileModel.objects.create(
             user=user,
             system_id='private_system',
@@ -44,12 +43,9 @@ class TestProfileAPI:
         url = reverse('v1:profile-list')
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        # Deve conter o oficial e o privado
         system_ids = [p['system_id'] for p in response.data]
         assert official_profile.system_id in system_ids
         assert private_profile.system_id in system_ids
-        # Não deve conter perfis de outros usuários
-        # (criaremos um segundo usuário e seu perfil para garantir)
         other_user = get_user_model().objects.create_user(username='other')
         other_profile = ProfileModel.objects.create(
             user=other_user,
@@ -60,7 +56,7 @@ class TestProfileAPI:
         assert 'other_system' not in [p['system_id'] for p in response.data]
 
     def test_create_profile_authenticated(self, authenticated_client):
-        """Usuário autenticado cria perfil com associação automática."""
+        """Authenticated user creates profile with auto association."""
         client, user = authenticated_client
         url = reverse('v1:profile-list')
         data = {
@@ -70,12 +66,11 @@ class TestProfileAPI:
         }
         response = client.post(url, data, format='json')
         assert response.status_code == status.HTTP_201_CREATED
-        # Verifica se o perfil foi criado com o user correto
         profile = ProfileModel.objects.get(system_id='new_system')
         assert profile.user == user
 
     def test_create_official_profile_as_non_admin(self, authenticated_client):
-        """Usuário não-admin não pode criar perfil oficial."""
+        """Non-admin user cannot create an official profile."""
         client, user = authenticated_client
         url = reverse('v1:profile-list')
         data = {
@@ -85,15 +80,13 @@ class TestProfileAPI:
             'schemas': {}
         }
         response = client.post(url, data, format='json')
-        # Deve retornar 403 ou 400 (dependendo da permissão)
         assert response.status_code in [
             status.HTTP_403_FORBIDDEN, status.HTTP_400_BAD_REQUEST]
 
     def test_retrieve_private_profile_only_owner(self, authenticated_client):
         """
-        Perfil privado: apenas o dono pode visualizar.
+        Private profile: only the owner can see.
         """
-        # Cria um usuário dono e seu perfil privado
         User = get_user_model()
         owner = User.objects.create_user(username='owner', password='pass')
         private_profile = ProfileFactory(
@@ -104,12 +97,10 @@ class TestProfileAPI:
         url = reverse('v1:profile-detail',
                       kwargs={'system_id': private_profile.system_id})
 
-        # 1. Usuário anônimo: usa APIClient limpo (sem autenticação)
         anon_client = APIClient()
         response = anon_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-        # 2. Outro usuário autenticado: cria um novo cliente e autentica
         other_user = User.objects.create_user(
             username='other', password='pass')
         other_client = APIClient()
@@ -117,7 +108,6 @@ class TestProfileAPI:
         response = other_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-        # 3. Dono autenticado: cria um cliente para o dono
         owner_client = APIClient()
         owner_client.force_authenticate(user=owner)
         response = owner_client.get(url)
@@ -125,17 +115,15 @@ class TestProfileAPI:
         assert response.data['system_id'] == private_profile.system_id
 
     def test_update_private_profile_owner_only(self, authenticated_client, user_profile):
-        """Apenas o dono pode atualizar um perfil privado."""
+        """Only the owner can update a private profile."""
         client, user, profile = user_profile
         url = reverse('v1:profile-detail',
                       kwargs={'system_id': profile.system_id})
         data = {'display_name': 'Updated Name'}
-        # Dono pode
         response = client.patch(url, data, format='json')
         assert response.status_code == status.HTTP_200_OK
         profile.refresh_from_db()
         assert profile.display_name == 'Updated Name'
-        # Outro usuário não pode
         other_client = APIClient()
         other_user = get_user_model().objects.create_user(username='other')
         other_client.force_authenticate(user=other_user)
@@ -144,26 +132,23 @@ class TestProfileAPI:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_delete_private_profile_owner_only(self, authenticated_client, user_profile):
-        """Apenas o dono pode deletar um perfil privado."""
+        """Only the owner can delete a private profile."""
         client, user, profile = user_profile
         url = reverse('v1:profile-detail',
                       kwargs={'system_id': profile.system_id})
-        # Dono pode
         response = client.delete(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ProfileModel.objects.filter(id=profile.id).exists()
-        # Tentar deletar novamente (já deletado) deve retornar 404
         response = client.delete(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_retrieve_official_profile_anyone(self, api_client, authenticated_client, official_profile):
-        """Perfil oficial é visível para qualquer um."""
+        """Official profile is visible to everyone."""
         url = reverse('v1:profile-detail',
                       kwargs={'system_id': official_profile.system_id})
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['system_id'] == official_profile.system_id
-        # Usuário autenticado também vê
         client, user = authenticated_client
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK

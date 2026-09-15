@@ -22,21 +22,19 @@ def configure_sheet_from_profile(profile: ProfileModel):
         default_field = sheet[field]
         schema = profile_schemas[schema_key]
         schema_default = schema.get('default')
-        print(default_field, 'antes')
 
         if not schema_default and schema_default is not None:
             if isinstance(default_field, list):
                 is_field_a_list = True
-            print(schema_default, 'VALOR DE DEFAULT')
+
             default_field = schema.get('custom_schema')
             new_default_field = strip_metadata(default_field)
-            print(default_field, 'depois')
+
             if is_field_a_list:
                 item_field = list()
                 item_field.append(new_default_field)
                 sheet[field] = item_field
-                print(item_field)
-                print(sheet[field])
+
                 continue
             sheet[field] = new_default_field
 
@@ -46,7 +44,7 @@ def configure_sheet_from_profile(profile: ProfileModel):
 
         if schema.get('added_fields'):
             new_added_fields = strip_metadata(schema.get('added_fields'))
-            print(new_added_fields, 'NEW ADDED FIELDS')
+
             default_field.update(new_added_fields)
 
         if schema.get('field_overrides'):
@@ -56,15 +54,9 @@ def configure_sheet_from_profile(profile: ProfileModel):
                     default_field.update({field: field_value})
                     continue
                 elif field_value is None:
-                    print(f'APAGAR FIELD {field}')
-                    print(f'APAGAR ESSE FIELD {default_field.get(field)}')
+
                     default_field.pop(field, None)
 
-    print('FINAL SHEET')
-    print('FINAL SHEET')
-    print('FINAL SHEET')
-    print('FINAL SHEET')
-    print(sheet)
     return (sheet)
     ...
 
