@@ -12,10 +12,11 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
         django_get_or_create = ('username',)
+        # skip_postgeneration_save = True
 
     username = factory.Sequence(lambda n: f'user_{n}')
     email = factory.LazyAttribute(lambda obj: f'{obj.username}@example.com')
-    password = factory.PostGenerationMethodCall('set_password', 'Test@1234')
+    password = factory.django.Password('Test@1234')
     first_name = factory.LazyAttribute(lambda _: fake.first_name())
     last_name = factory.LazyAttribute(lambda _: fake.last_name())
     is_active = True
