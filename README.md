@@ -4,6 +4,7 @@
 
 **A RESTful API for building and managing custom RPG character sheets for any tabletop system.**
 
+[![CI](https://github.com/matheusmessiasdev/neo-sheet/actions/workflows/ci.yaml/badge.svg)](https://github.com/matheusmessiasdev/neo-sheet/actions/workflows/ci.yaml)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/Django-6.0-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![DRF](https://img.shields.io/badge/DRF-3.x-A30000?style=for-the-badge&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
