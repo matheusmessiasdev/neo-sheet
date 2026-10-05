@@ -45,5 +45,18 @@ class RollDiceSerializer(serializers.Serializer):
                                     max_value=999, allow_null=True, default=0)
 
 
+# DOCS
+class RollDiceResponseSerializer(serializers.Serializer):
+    dice_notation = serializers.CharField()
+    rolls = serializers.ListField(child=serializers.IntegerField())
+    rolls_final = serializers.ListField(child=serializers.IntegerField())
+    is_critical = serializers.BooleanField()
+    is_fumble = serializers.BooleanField()
+    total = serializers.IntegerField()
+    modifier = serializers.IntegerField()
+    total_with_modifier = serializers.IntegerField()
+    context = serializers.DictField()
+
+
 if __name__ == '__main__':
     ...

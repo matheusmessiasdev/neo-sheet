@@ -1,0 +1,1285 @@
+openapi: 3.0.3
+info:
+  title: Neo-Sheet
+  version: 1.0.0
+  description: A RESTful API for building and managing custom RPG character sheets.
+paths:
+  /api/v1/auth/jwt/create/:
+    post:
+      operationId: auth_jwt_create_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+      security: []
+  /api/v1/auth/jwt/refresh/:
+    post:
+      operationId: auth_jwt_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+      security: []
+  /api/v1/auth/jwt/verify/:
+    post:
+      operationId: auth_jwt_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+      security: []
+  /api/v1/auth/users/:
+    get:
+      operationId: auth_users_list
+      tags:
+      - auth
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: auth_users_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      security: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreate'
+          description: ''
+  /api/v1/auth/users/{id}/:
+    get:
+      operationId: auth_users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - auth
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: auth_users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: auth_users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: auth_users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - auth
+      security:
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/users/activation/:
+    post:
+      operationId: auth_users_activation_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ActivationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ActivationRequest'
+        required: true
+      security: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activation'
+          description: ''
+  /api/v1/auth/users/me/:
+    get:
+      operationId: auth_users_me_retrieve
+      tags:
+      - auth
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: auth_users_me_update
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: auth_users_me_partial_update
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: auth_users_me_destroy
+      tags:
+      - auth
+      security:
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/users/resend_activation/:
+    post:
+      operationId: auth_users_resend_activation_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+        required: true
+      security: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /api/v1/auth/users/reset_password/:
+    post:
+      operationId: auth_users_reset_password_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+        required: true
+      security: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /api/v1/auth/users/reset_password_confirm/:
+    post:
+      operationId: auth_users_reset_password_confirm_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+        required: true
+      security: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetConfirm'
+          description: ''
+  /api/v1/auth/users/reset_username/:
+    post:
+      operationId: auth_users_reset_username_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailResetRequest'
+        required: true
+      security: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /api/v1/auth/users/reset_username_confirm/:
+    post:
+      operationId: auth_users_reset_username_confirm_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirmRequest'
+        required: true
+      security: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameResetConfirm'
+          description: ''
+  /api/v1/auth/users/set_password/:
+    post:
+      operationId: auth_users_set_password_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetPassword'
+          description: ''
+  /api/v1/auth/users/set_username/:
+    post:
+      operationId: auth_users_set_username_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetUsernameRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetUsernameRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetUsernameRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetUsername'
+          description: ''
+  /api/v1/dice/rolls/base/:
+    post:
+      operationId: dice_rolls_base_create
+      description: |
+        Rolls dice based on XdY notation (ex: 2d6, 3d8+5).
+        Supports operators:
+        - `kh` (keep highest): 4d6kh3
+        - `kl` (keep lowest): 4d6kl2
+        - `!` (explosive): 3d6!
+      summary: Roll Dice
+      tags:
+      - Dice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollDiceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RollDiceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RollDiceRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RollDiceResponse'
+          description: ''
+      security: []
+  /api/v1/profiles/:
+    get:
+      operationId: profiles_list
+      description: Returns a list of available profiles. Authenticated users see official
+        profiles + their own. Anonymous users see only official profiles.
+      summary: List profiles
+      tags:
+      - Profiles
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileList'
+          description: ''
+    post:
+      operationId: profiles_create
+      description: Creates a new system profile. Only authenticated users can create
+        profiles. Only staff can create official profiles.
+      summary: Create Profile
+      tags:
+      - Profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+  /api/v1/profiles/{system_id}/:
+    get:
+      operationId: profiles_retrieve
+      description: Returns the details of a specific profile. Private profiles are
+        only visible to the owner.
+      summary: Detail profile
+      parameters:
+      - in: path
+        name: system_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Profiles
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    patch:
+      operationId: profiles_partial_update
+      description: Updates partially a profile. Only the owner can update private
+        profiles.
+      summary: Update profile (partial)
+      parameters:
+      - in: path
+        name: system_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    delete:
+      operationId: profiles_destroy
+      description: Deletes a profile. Only the owner can delete a private profile.
+      summary: Deletes profile
+      parameters:
+      - in: path
+        name: system_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Profiles
+      security:
+      - BearerAuth: []
+      responses:
+        '204':
+          description: Profile deleted successfully
+  /api/v1/profiles/{system_id}/sheet/:
+    get:
+      operationId: profiles_sheet_retrieve
+      description: Creates a character sheet from a specific profile, with metadata
+        removed.
+      summary: Creates sheet from profile
+      parameters:
+      - in: path
+        name: system_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Profiles
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: Sheet created
+  /api/v1/profiles/blank_profile/:
+    get:
+      operationId: profiles_blank_profile_retrieve
+      description: Returns an empty template for creating a new profile. Serves as
+        a starting point to understend the expected structure.
+      summary: Empty template for creation
+      tags:
+      - Profiles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: Empty Template
+      security: []
+  /api/v1/profiles/generic_sheet/:
+    get:
+      operationId: profiles_generic_sheet_retrieve
+      description: Returns the base schema that servers for all profiles.
+      summary: Global base schema
+      tags:
+      - Profiles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: Base Schema
+      security: []
+  /api/v1/profiles/profile_template/:
+    get:
+      operationId: profiles_profile_template_retrieve
+      description: Returns the profile template with descriptions and examples, assisting
+        creation.
+      summary: Template with docs
+      tags:
+      - Profiles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: Documentated template
+      security: []
+  /api/v1/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - ht
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    Activation:
+      type: object
+      properties:
+        uid:
+          type: string
+        token:
+          type: string
+      required:
+      - token
+      - uid
+    ActivationRequest:
+      type: object
+      properties:
+        uid:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+      required:
+      - token
+      - uid
+    PasswordResetConfirm:
+      type: object
+      properties:
+        uid:
+          type: string
+        token:
+          type: string
+        new_password:
+          type: string
+      required:
+      - new_password
+      - token
+      - uid
+    PasswordResetConfirmRequest:
+      type: object
+      properties:
+        uid:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+      - token
+      - uid
+    PatchedProfileRequest:
+      type: object
+      properties:
+        system_id:
+          type: string
+          minLength: 1
+          maxLength: 50
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        schemas:
+          type: object
+          additionalProperties: {}
+        is_official:
+          type: boolean
+    PatchedUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+    Profile:
+      type: object
+      properties:
+        system_id:
+          type: string
+          maxLength: 50
+        display_name:
+          type: string
+          maxLength: 100
+        schemas:
+          type: object
+          additionalProperties: {}
+        is_official:
+          type: boolean
+      required:
+      - display_name
+      - system_id
+    ProfileList:
+      type: object
+      properties:
+        system_id:
+          type: string
+          maxLength: 50
+        display_name:
+          type: string
+          maxLength: 100
+      required:
+      - display_name
+      - system_id
+    ProfileRequest:
+      type: object
+      properties:
+        system_id:
+          type: string
+          minLength: 1
+          maxLength: 50
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        schemas:
+          type: object
+          additionalProperties: {}
+        is_official:
+          type: boolean
+      required:
+      - display_name
+      - system_id
+    RollDiceRequest:
+      type: object
+      properties:
+        formula:
+          type: string
+          minLength: 1
+          default: 1d20
+          maxLength: 50
+        critical_value:
+          type: integer
+          maximum: 100
+          minimum: 1
+          nullable: true
+        critical_mult:
+          type: integer
+          maximum: 100
+          minimum: 1
+          nullable: true
+          default: 1
+        drop:
+          type: integer
+          maximum: 999
+          minimum: 0
+          nullable: true
+          default: 0
+    RollDiceResponse:
+      type: object
+      properties:
+        dice_notation:
+          type: string
+        rolls:
+          type: array
+          items:
+            type: integer
+        rolls_final:
+          type: array
+          items:
+            type: integer
+        is_critical:
+          type: boolean
+        is_fumble:
+          type: boolean
+        total:
+          type: integer
+        modifier:
+          type: integer
+        total_with_modifier:
+          type: integer
+        context:
+          type: object
+          additionalProperties: {}
+      required:
+      - context
+      - dice_notation
+      - is_critical
+      - is_fumble
+      - modifier
+      - rolls
+      - rolls_final
+      - total
+      - total_with_modifier
+    SendEmailReset:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    SendEmailResetRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    SetPassword:
+      type: object
+      properties:
+        new_password:
+          type: string
+        current_password:
+          type: string
+      required:
+      - current_password
+      - new_password
+    SetPasswordRequest:
+      type: object
+      properties:
+        new_password:
+          type: string
+          minLength: 1
+        current_password:
+          type: string
+          minLength: 1
+      required:
+      - current_password
+      - new_password
+    SetUsername:
+      type: object
+      properties:
+        current_password:
+          type: string
+        new_username:
+          type: string
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - current_password
+      - new_username
+    SetUsernameRequest:
+      type: object
+      properties:
+        current_password:
+          type: string
+          minLength: 1
+        new_username:
+          type: string
+          minLength: 1
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - current_password
+      - new_username
+    TokenObtainPair:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+      required:
+      - access
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - refresh
+    TokenVerifyRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - token
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+      required:
+      - email
+      - id
+      - username
+    UserCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        id:
+          type: integer
+          readOnly: true
+      required:
+      - email
+      - id
+      - username
+    UserCreateRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+      - username
+    UserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+      required:
+      - email
+    UsernameResetConfirm:
+      type: object
+      properties:
+        new_username:
+          type: string
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - new_username
+    UsernameResetConfirmRequest:
+      type: object
+      properties:
+        new_username:
+          type: string
+          minLength: 1
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - new_username
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

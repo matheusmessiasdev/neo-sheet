@@ -11,21 +11,25 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(DEBUG=(bool, False),)
+
+environ.Env.read_env(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0i-2+ei16f^1wip!wgzg%3k$e08z)57^s00p#stj*03k2ek)tb'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['192.168.0.2', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 
 # Application definition
@@ -37,13 +41,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
+    'drf_spectacular',
     'rest_framework',
+    'djoser',
     'dice',
     'sheets',
+    'accounts',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,8 +86,13 @@ WSGI_APPLICATION = 'proto_sheet.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST', default='db'),
+        'PORT': env('POSTGRES_PORT', default='5432'),
+
     }
 }
 
@@ -101,6 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'accounts.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -121,6 +136,109 @@ STATIC_URL = 'static/'
 
 REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'DEFAULT_VERSION': 'v1',
-    'ALLOWED_VERSIONS': ['v1']
+    'ALLOWED_VERSIONS': ['v1'],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'EXCEPTION_HANDLER': 'proto_sheet.exceptions.custom_exception_handler',
 }
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+EMAIL_BACKEND = env(
+    'EMAIL_BACKEND',
+    default='django.core.mail.backends.console.EmailBackend',
+)
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL',
+                         default='no-reply@neo-sheet.local')
+
+DJOSER = {
+    'TOKEN_MODEL': None,
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': False,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': False,
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': False,
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {'console': {'class': 'logging.StreamHandler'}},
+    'loggers': {
+        'django.request': {'handlers': ['console'], 'level': 'DEBUG'},
+    },
+}
+
+TEST_RUNNER = 'pytest'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Neo-Sheet',
+    'VERSION': '1.0.0',
+    'DESCRIPTION': 'A RESTful API for building and managing custom RPG character sheets.',
+    'POSTPROCESSING_HOOKS': [
+        'accounts.schema_hooks.fix_djoser_security',
+    ],
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY_DEFINITIONS': {
+        'BearerAuth': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'JWT Authorization header. Exemplo: "Bearer {token}"',
+        },
+    },
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': env('REDIS_URL', default='redis://redis:6379/0'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+    }
+}
+
+RATELIMITS = {
+    'login': '5/m',
+    'register': '3/h',
+    'password_reset': '3/h',
+    'password_reset_confirm': '5/m',
+    'dice_roll': '60/m',
+}
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', default=True)
+    CSRF_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', default=True)
+    SESSION_COOKIE_HTTPONLY = True
+
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    X_FRAME_OPTIONS = 'DENY'
+
+    SECURE_REFERRER_POLICY = 'same-origin'

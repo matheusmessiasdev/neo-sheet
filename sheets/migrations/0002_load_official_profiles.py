@@ -116,6 +116,160 @@ def create_official_profiles(apps, schema_editor):
         }
     )
 
+    ProfileModel.objects.get_or_create(
+        system_id='sorcerers_and_curses',
+        display_name='Sorcerers and Curses',
+        is_official=True,
+        schemas={
+            "identity_schema": {
+                "default": False,
+                "added_fields": {},
+                "field_overrides": {},
+                "custom_schema": {
+                    "name": "",
+                    "player": "",
+                    "origin": "",
+                    "specialization": "",
+                    "technique": "",
+                    "grade": "",
+                    "experience": 0,
+                    "level": 0,
+                    "training": 0,
+                }
+            },
+            "attributes_schema": {
+                "default": False,
+                "added_fields": {},
+                "field_overrides": {},
+                "custom_schema": {
+                    "str": 0,
+                    "dex": 0,
+                    "con": 0,
+                    "int": 0,
+                    "wis": 0,
+                    "pre": 0
+                }
+            },
+            "status_schema": {
+                "default": True,
+                "added_fields": {
+                    "energy": {
+                        "current": 0,
+                        "max": 0,
+                        "temporary": 0
+                    },
+                    "stamina": {
+                        "current": 0,
+                        "max": 0,
+                        "temporary": 0
+                    },
+                    "integrity": {
+                        "total": 0,
+                        "base": 10,
+                        "others": 0
+                    },
+                    "attention": {
+                        "total": 0,
+                        "base": 10,
+                        "others": 0
+                    },
+                    "initiative": {
+                        "total": 0,
+                        "others": 0,
+                    }
+                },
+                "field_overrides": {
+                    "health": {
+                        "current": 0,
+                        "max": 0,
+                        "temporary": 0
+                    },
+                    "sanity": None,
+                    "mana": None
+                },
+                "custom_schema": {}
+            },
+            "defense_schema": {
+                "default": True,
+                "added_fields": {
+                    "damage_reduction": {}
+                },
+                "field_overrides": {
+                    "imunities": None
+                },
+                "custom_schema": {}
+            },
+            "skills_item_schema": {
+                "default": True,
+                "added_fields": {
+                    "others": 0,
+                    "temporary": 0,
+                    "mastered": False,
+                    "trained": False
+                },
+                "field_overrides": {
+                    "extra": None
+                },
+                "custom_schema": {}
+            },
+            "abilities_item_schema": {
+                "default": True,
+                "added_fields": {
+                    "specialization": "",
+                    "level_requirement": "",
+                    "max": 0
+                },
+                "field_overrides": {},
+                "custom_schema": {}
+            },
+            "spells_item_schema": {
+                "default": True,
+                "added_fields": {
+                    "conjuration": "",
+                    "level": "",
+                },
+                "field_overrides": {},
+                "custom_schema": {}
+            },
+            "inventory_item_schema": {
+                "default": True,
+                "added_fields": {
+                    "item_type": 0,
+                    "weapon_values": {},
+                    "_weapon_values_example": {
+                        "damage": "",
+                        "damage_type": "",
+                        "critical_range": 0,
+                        "critical_mult": 0,
+                        "handling": "",
+                        "proficiency": ""
+                    },
+                    "category": 0,
+                    "mods": [],
+                    "tag": 0
+                },
+                "field_overrides": {},
+                "custom_schema": {}
+            },
+            "custom_fields": {
+                "cursed_cd": {
+                    "base": 10,
+                    "attribute": "",
+                    "train": 0,
+                    "level_halved": 0,
+                    "others": 10,
+                },
+                "aptitude_levels": {
+                    "aura_aptitude": 0,
+                    "read_and_control_aptitude": 0,
+                    "barriers_aptitude": 0,
+                    "domain_aptitude": 0,
+                    "reverse_energy_aptitude": 0,
+                }
+            }
+        }
+    )
+
 
 class Migration(migrations.Migration):
     dependencies = [

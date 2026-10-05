@@ -1,4 +1,3 @@
-
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -11,6 +10,7 @@ dist/
 venv/
 env/
 ENV/
+
 
 *.log
 db.sqlite3
