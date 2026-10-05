@@ -8,6 +8,7 @@ drf-spectacular==0.30.0
 gunicorn==23.0.0
 psycopg2-binary==2.9.10
 django-environ==0.11.2
+django-ratelimit==4.1.0
 django-redis==5.4.0
 django-extensions==4.1
 pytest==9.1.1
@@ -15,3 +16,4 @@ pytest-django==4.14.0
 pytest-cov==7.1.0
 factory_boy==3.3.3
 Faker==40.36.0
+whitenoise==6.12.0

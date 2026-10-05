@@ -16,6 +16,10 @@ from .permissions import IsUserOrReadOnly
 from django.shortcuts import render
 from django.db.models import Q
 from django.http import Http404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
+from django.core.cache import cache
 # Create your views here.
 
 
@@ -68,6 +72,8 @@ from django.http import Http404
             description='Profile deleted successfully')},
     ),
 )
+@method_decorator(vary_on_headers('Authorization'), name='list')
+@method_decorator(cache_page(60 * 5), name='list')
 class ProfilesViewSet(viewsets.ModelViewSet):
     """
     List of system profiles avaliable.
@@ -97,8 +103,10 @@ class ProfilesViewSet(viewsets.ModelViewSet):
         is_official = serializer.validated_data.get('is_official', False)
         if is_official and not user.is_staff:
             raise PermissionDenied("Only staff can create official profiles.")
+
         serializer.save(user=self.request.user,
                         is_official=is_official if user.is_staff else False)
+        cache.clear()
         return super().perform_create(serializer)
 
     def get_serializer_class(self):
@@ -133,6 +141,7 @@ class ProfilesViewSet(viewsets.ModelViewSet):
         responses={200: OpenApiResponse(
             description='Base Schema', response=dict)},
     )
+    @method_decorator(cache_page(60 * 15))
     @action(detail=False)
     def generic_sheet(self, request):
         """

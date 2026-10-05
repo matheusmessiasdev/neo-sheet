@@ -6,6 +6,8 @@ from .serializers import RollDiceSerializer, RollDiceResponseSerializer
 from .services.roll_base import roll_dice_formula
 from drf_spectacular.utils import extend_schema
 import re
+from django_ratelimit.decorators import ratelimit
+from django.conf import settings
 # Create your views here.
 
 
@@ -24,6 +26,7 @@ import re
     responses={200: RollDiceResponseSerializer},
 )
 @api_view(['POST'])
+@ratelimit(key='ip', rate=settings.RATELIMITS['dice_roll'], method='POST', block=True)
 def roll_base_dice(request):
     """
     Rolls dices based of the dice notation (XdY). 
