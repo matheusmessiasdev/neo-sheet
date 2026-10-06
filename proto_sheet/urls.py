@@ -16,10 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='api/v1/schema/swagger-ui/',
+         permanent=False), name='root-redirect'),
     path('api/v1/', include('api.v1.urls', namespace='v1')),
     path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/v1/schema/swagger-ui/',
