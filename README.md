@@ -4,13 +4,13 @@
 
 **A RESTful API for building and managing custom RPG character sheets for any tabletop system.**
 
-[![CI](https://github.com/matheusmessiasdev/neo-sheet/actions/workflows/ci.yaml/badge.svg)](https://github.com/matheusmessiasdev/neo-sheet/actions/workflows/ci.yaml)
+[![CI](https://img.shields.io/github/actions/workflow/status/matheusmessiasdev/neo-sheet/ci.yaml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/matheusmessiasdev/neo-sheet/actions/workflows/ci.yaml)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/Django-6.0-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![DRF](https://img.shields.io/badge/DRF-3.x-A30000?style=for-the-badge&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-planned-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/Redis-planned-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Docker](https://img.shields.io/badge/Docker-planned-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)](./LICENSE)
 
 [Quick Start](#-quick-start) · [Features](#-features) · [Tech Stack](#%EF%B8%8F-tech-stack) · [Roadmap](#%EF%B8%8F-roadmap) · [Docs](#-documentation)
