@@ -46,11 +46,11 @@ Instead of hardcoding attributes, statuses, and inventory structures, the API ex
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # 1. Clone and enter the project
-git clone https://github.com/<your-user>/neo-sheet.git && cd neo-sheet
+git clone https://github.com/matheusmessiasdev/neo-sheet.git && cd neo-sheet
 
 # 2. Create a virtualenv and install dependencies
 python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
@@ -144,7 +144,7 @@ The API ships with **interactive, always-up-to-date documentation**:
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [x] User model, JWT auth, `djoser` integration
 - [x] Profile CRUD with dynamic schemas
@@ -152,11 +152,11 @@ The API ships with **interactive, always-up-to-date documentation**:
 - [x] Interactive OpenAPI docs (Swagger UI + Redoc)
 - [x] Granular endpoint security in the schema
 - [x] Unit + integration test suite
-- [ ] Docker + Docker Compose (PostgreSQL + Redis)
-- [ ] Redis cache for public profiles and schemas
-- [ ] Rate limiting on auth endpoints
-- [ ] GitHub Actions CI/CD pipeline
-- [ ] Deploy to a public environment
+- [x] Docker + Docker Compose (PostgreSQL + Redis)
+- [x] Redis cache for public profiles and schemas
+- [x] Rate limiting on auth endpoints
+- [x] GitHub Actions CI/CD pipeline
+- [x] Deploy to a public environment
 - [ ] Reference frontend consuming the API
 
 ---
@@ -179,4 +179,4 @@ Please run `pytest` before submitting.
 
 Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
 
-Made with ❤️ by [Your Name](https://www.linkedin.com/in/your-profile/)
+Made with ❤️ by [Matheus Messias](https://www.linkedin.com/in/matheusmessiasdev/)
