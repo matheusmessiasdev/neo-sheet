@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neo-Sheet: define the game, get the sheet</title>
+<meta name="description" content="Neo-Sheet is a schema-driven REST API for tabletop RPGs. Define a game system as a profile, get a character sheet and a dice engine.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Source+Sans+3:wght@400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0c0b;--fg:#eef0ec;--mut:#a4aaa2;--line:#242824;--line2:#3a3f3a;--g:#62e69a;--on:#04120a;--ease:cubic-bezier(.16,1,.3,1);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#3a3f3a #0b0c0b}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 1.0625rem/1.55 'Source Sans 3',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+::selection{background:var(--g);color:var(--on)}
+a{color:inherit}[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--g);outline-offset:3px;border-radius:6px}
+code{font-family:'JetBrains Mono',ui-monospace,monospace}
+.px{font-family:'Pixelify Sans','Courier New',monospace}
+.w{max-width:1280px;margin:0 auto;padding:0 clamp(1.25rem,4vw,3rem)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding-top:1.25rem;padding-bottom:1.25rem;gap:1rem}
+.logo{display:flex;align-items:center;gap:.6rem;font:700 1.15rem 'Pixelify Sans',monospace;letter-spacing:.06em;text-decoration:none}
+.nl{display:flex;align-items:center;gap:1.75rem;font-weight:600;font-size:.95rem}
+.nl a{text-decoration:none}.nl a:hover{color:var(--g)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.4rem;border-radius:999px;font-weight:700;font-size:1rem;text-decoration:none;border:1px solid var(--line2);color:var(--fg);transition:background .25s,border-color .25s,transform .25s var(--ease)}
+.btn:hover{border-color:var(--g);transform:translateY(-1px)}
+.btn.p{background:var(--g);border-color:var(--g);color:var(--on)}.btn.p:hover{background:#8af0b4}
+.btn.s{padding:.55rem 1.1rem;font-size:.9rem}
+.sp svg{display:block;fill:var(--fg)}.sp rect.a{fill:var(--g)}
+h1{font:700 clamp(2.25rem,8vw,6rem)/1.02 'Pixelify Sans','Courier New',monospace;letter-spacing:-.02em;margin:clamp(2.5rem,7vw,5.5rem) 0 0;text-wrap:balance}
+.stage{position:relative;margin-top:2.5rem}
+.rail{position:relative;height:128px;border-bottom:1px solid var(--line2)}
+.walker,.core,.pop{position:absolute;bottom:-1px;left:0}
+.walker{width:55px;height:70px}.pop{bottom:0;visibility:hidden}
+.walker .f{position:absolute;left:0;bottom:0}.walker .f2{visibility:hidden}
+.walker.s2 .f1{visibility:hidden}.walker.s2 .f2{visibility:visible}
+.walker .it{position:absolute;left:46px;bottom:18px;visibility:hidden}
+.walker.h1 .i1,.walker.h2 .i2{visibility:visible}
+.core{left:calc(50% - 27px);width:55px;height:55px}
+.core.work svg{fill:var(--g)}.core.work svg rect.a{fill:var(--fg)}
+.core.work.j svg{fill:var(--fg)}.core.work.j svg rect.a{fill:var(--g)}
+.core i{position:absolute;left:25px;top:25px;width:5px;height:5px;background:var(--g);opacity:0}
+.core.work i{animation:spark .5s steps(4) infinite;animation-delay:calc(var(--d)*70ms)}
+@keyframes spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+.bub{position:absolute;left:50%;bottom:98px;transform:translateX(-50%);font:500 .8rem 'JetBrains Mono',monospace;color:var(--g);border:1px solid var(--g);background:var(--bg);padding:.2rem .6rem;border-radius:4px;white-space:nowrap;visibility:hidden}.bub.on{visibility:visible}
+.cap{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;margin-top:.6rem;font:500 .8rem/1.4 'JetBrains Mono',monospace;color:var(--mut)}
+.cap small{display:block;font:inherit;opacity:.75}.cap .c2{text-align:center}.cap .c3{text-align:right}
+.cap .c2,.cap .c3{transition:color .2s}.cap.work .c2,.cap.end .c3{color:var(--g)}
+.hrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2rem;align-items:center;padding:2rem 0}
+.hrow p{margin:0;max-width:46ch;font-size:1.125rem}
+.acts{display:flex;flex-wrap:wrap;gap:.75rem}
+section.w{padding-top:clamp(4rem,9vw,7rem)}
+h2{font:700 clamp(1.9rem,4.4vw,3rem)/1.1 'Pixelify Sans',monospace;margin:0 0 .75rem;text-wrap:balance}
+.lead{color:var(--mut);max-width:60ch;margin:0 0 2rem}
+.sys{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.sys button{font:600 .95rem 'Source Sans 3',sans-serif;color:var(--fg);background:none;border:1px solid var(--line2);border-radius:999px;padding:.5rem 1.1rem;cursor:pointer;transition:background .2s,color .2s}
+.sys button[aria-pressed=true]{background:var(--g);border-color:var(--g);color:var(--on)}
+.pair{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line2);border-radius:14px;overflow:hidden}
+.pair pre{margin:0;padding:1.5rem;font-size:.8125rem;line-height:1.75;color:var(--mut);overflow-x:auto;min-height:21rem}
+.pair pre b{color:var(--g);font-weight:400}.pair pre i{font-style:normal;color:var(--fg)}
+.sheet{padding:1.5rem;border-left:1px solid var(--line2)}
+.sheet h3{margin:0 0 .75rem;font-size:1.35rem;font-weight:800;display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+.sheet h3 small{font:400 .8rem 'JetBrains Mono',monospace;color:var(--mut)}
+.r{display:grid;grid-template-columns:1fr auto;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--line);animation:in .7s var(--ease) both;animation-delay:calc(var(--i)*45ms)}
+.v{font:500 .875rem 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;min-width:4.5ch;text-align:right;border:1px solid var(--line2);border-radius:6px;padding:.1rem .6rem}
+@keyframes in{from{clip-path:inset(0 100% 0 0);transform:translateX(-8px)}to{clip-path:inset(0);transform:none}}
+.note{color:var(--mut);font-size:.9rem;margin:1rem 0 0}.note code{color:var(--fg);font-size:.82rem}
+.slab{background:var(--g);color:var(--on)}
+.sg{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(1.5rem,4vw,4rem);padding-top:clamp(2rem,5vw,3.5rem);padding-bottom:clamp(2rem,5vw,3.5rem)}
+.slab label{display:block;font:700 .8rem 'JetBrains Mono',monospace;letter-spacing:.04em;margin-bottom:.4rem}
+.req{font:700 .9rem 'JetBrains Mono',monospace;margin:0 0 1.25rem}
+.fx{display:flex;gap:.6rem;flex-wrap:wrap}
+.fx input{flex:1 1 9rem;min-width:0;background:var(--on);color:var(--g);border:2px solid var(--on);border-radius:10px;padding:.7rem 1rem;font-size:1.25rem;font-weight:700;caret-color:var(--g)}
+.fx input:focus-visible{outline:2px solid var(--on);outline-offset:3px}
+.slab .btn{background:var(--on);border-color:var(--on);color:var(--g)}.slab .btn:hover{background:#0b2a1a}
+.slab :focus-visible{outline-color:var(--on)}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+.chips button{font:500 .85rem 'JetBrains Mono',monospace;background:none;border:1.5px solid var(--on);color:var(--on);border-radius:999px;padding:.35rem .8rem;cursor:pointer}
+.chips button:hover{background:var(--on);color:var(--g)}
+.hint{font-size:.9rem;margin:1.25rem 0 0;max-width:40ch}.hint a{font-weight:600}
+#dice{display:flex;flex-wrap:wrap;gap:.5rem;min-height:3.25rem;margin-bottom:1rem}
+.dd{width:3.25rem;height:3.25rem;display:grid;place-items:center;font:700 1.25rem 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;border-radius:8px;background:var(--on);color:var(--g)}
+.dd.x{background:none;border:2px dashed var(--on);color:var(--on);text-decoration:line-through;opacity:.75}
+.dd.t{animation:tum .12s steps(2) infinite}
+@keyframes tum{50%{transform:translateY(-3px) rotate(-4deg)}}
+.slab pre{margin:0;font-size:.8125rem;line-height:1.7;overflow-x:auto;color:var(--on)}
+.slab{margin-top:clamp(4rem,9vw,7rem)}.slab h2{color:var(--on);margin:0 0 1.25rem}
+.dd.c{outline:2px solid var(--on);outline-offset:3px}.dd.e{background:none;border:2px solid var(--on);color:var(--on)}
+.slab pre b{background:var(--on);color:var(--g);padding:0 .3em;border-radius:3px;font-weight:700}
+.led{border-top:1px solid var(--line2)}
+.row{display:grid;grid-template-columns:4.5rem minmax(0,1.3fr) minmax(0,1fr) 7.5rem;gap:1.25rem;align-items:baseline;padding:1.1rem .5rem;border-bottom:1px solid var(--line);text-decoration:none;transition:background .25s,padding .35s var(--ease)}
+.row:hover{background:#141715;padding-left:1rem}
+.row code{font-size:.9rem;overflow-wrap:anywhere}
+.m{font:700 .75rem 'JetBrains Mono',monospace;color:var(--on);background:var(--g);border-radius:4px;padding:.15rem .5rem;text-align:center}
+.m.get{background:none;color:var(--g);border:1px solid var(--g)}
+.d{color:var(--fg)}.a{color:var(--mut);font-size:.85rem;text-align:right}
+.tl{display:flex;gap:2rem;border-bottom:1px solid var(--line2);margin-bottom:.5rem}
+.tl [role=tab]{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--mut);font:700 1.5rem 'Pixelify Sans',monospace;padding:.75rem 0;cursor:pointer}
+.tl [role=tab][aria-selected=true]{color:var(--fg);border-color:var(--g)}
+.fg{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:3rem}
+.fg li{padding:1.5rem 0;border-bottom:1px solid var(--line)}
+.fg h3{margin:0 0 .35rem;font-size:1.3rem;font-weight:800}.fg p{margin:0;color:var(--mut);max-width:44ch}
+.st{margin:0}.st div{display:grid;grid-template-columns:15rem 1fr;gap:1.5rem;padding:1.35rem 0;border-bottom:1px solid var(--line)}
+.st dt{color:var(--mut)}.st dd{margin:0;font-weight:600;font-size:1.15rem}
+.close h2{font-size:clamp(2.2rem,6vw,4.5rem);margin-bottom:2rem}
+footer.w::before{content:"";flex:0 0 100%;border-top:1px solid var(--line2);margin-bottom:.5rem}footer.w{margin-top:clamp(4rem,9vw,7rem);padding:0 clamp(1.25rem,4vw,3rem) 2.5rem;color:var(--mut);font-size:.9rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+@media(max-width:820px){.nl a:not(.btn){display:none}.hrow,.fg{grid-template-columns:1fr}.row{grid-template-columns:4.5rem 1fr;row-gap:.25rem}.row .d,.row .a{grid-column:2;text-align:left}.st div{grid-template-columns:1fr;gap:.25rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+@media(max-width:820px){.pair,.sg{grid-template-columns:1fr}.sheet{border-left:0;border-top:1px solid var(--line2)}.pair pre{min-height:0}.cap small{display:none}}
+</style>
+</head>
+<body>
+<header class="w nav">
+  <a class="logo" href="#"><span class="sp" data-sp="d20" data-px="2"></span>NEO-SHEET</a>
+  <nav class="nl" aria-label="Main">
+    <a href="#tabs" data-tab="t-feat">Features</a><a href="#tabs" data-tab="t-stack">Tech Stack</a>
+    <a href="https://neo-sheet.up.railway.app/api/v1/schema/redoc" target="_blank" rel="noopener">Docs</a>
+    <a class="btn s" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener">Explore API</a>
+  </nav>
+</header>
+<main>
+<section class="w" style="padding-top:0">
+  <h1>Define the game.<br>Get the sheet.</h1>
+  <div class="stage" id="stage" role="img" aria-label="Animation: a wizard carries a schema to the Neo-Sheet API, a d20, and leaves with a finished character sheet">
+    <div class="rail" id="rail">
+      <div class="bub" id="bub"></div>
+      <div class="core" id="core"><span class="sp" data-sp="d20" data-px="5"></span><i style="--dx:-44px;--dy:-34px;--d:0"></i><i style="--dx:44px;--dy:-34px;--d:1"></i><i style="--dx:0;--dy:-50px;--d:2"></i><i style="--dx:-52px;--dy:2px;--d:3"></i><i style="--dx:52px;--dy:2px;--d:4"></i><i style="--dx:0;--dy:-40px;--d:5"></i></div>
+      <div class="walker" id="w"><span class="sp f f1" data-sp="wiz1" data-px="5"></span><span class="sp f f2" data-sp="wiz2" data-px="5"></span><span class="sp it i1" data-sp="schema" data-px="4"></span><span class="sp it i2" data-sp="sheet" data-px="4"></span></div>
+      <div class="pop sp" id="pop" data-sp="sheet" data-px="4"></div>
+    </div>
+    <div class="cap" id="cap"><span class="c1">profile<small>schema</small></span><span class="c2">Neo-Sheet API<small>generates the sheet</small></span><span class="c3">sheet<small>JSON</small></span></div>
+  </div>
+  <div class="hrow">
+    <p>A schema-driven REST API for tabletop RPGs. A system becomes a profile; a profile becomes a character sheet at runtime. Dice engine included.</p>
+    <div class="acts">
+      <a class="btn p" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener">Explore the API <span aria-hidden="true">→</span></a>
+      <a class="btn" href="https://neo-sheet.up.railway.app/api/v1/schema/redoc" target="_blank" rel="noopener">Read the docs</a>
+      <a class="btn" href="https://github.com/matheusmessiasdev/neo-sheet" target="_blank" rel="noopener">View on GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="w" id="demo">
+  <h2>Schema in. Sheet out.</h2>
+  <p class="lead">Each game system is only a profile. Pick one and the sheet rebuilds from its schema, with no backend code per game.</p>
+  <div class="sys" role="group" aria-label="Game system"></div>
+  <div class="pair"><pre id="js" aria-label="Profile payload"></pre><div class="sheet" id="sh" aria-live="polite"></div></div>
+  <p class="note">Illustrative payloads. The live call is <code>GET /api/v1/profiles/{system_id}/sheet/</code>.</p>
+</section>
+
+<section class="slab" id="roll" aria-labelledby="rh">
+  <div class="w sg">
+    <form id="f" autocomplete="off">
+      <h2 id="rh">Dice, one request away.</h2>
+      <p class="req">POST /api/v1/dice/rolls/base/</p>
+      <label for="fx">formula</label>
+      <div class="fx"><input id="fx" value="4d6kh3" maxlength="50" spellcheck="false"><button class="btn" type="submit">Send request</button></div>
+      <div class="chips" role="group" aria-label="Example formulas"><button type="button">1d20</button><button type="button">4d6kh3</button><button type="button">2d20kl1</button><button type="button">3d6!</button><button type="button">2d8+5</button></div>
+      <p class="hint">Simulated in your browser with the same rules as the live engine. <a href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener">Send the real request in Swagger.</a></p>
+    </form>
+    <div><div id="dice" aria-live="polite"></div><pre id="out"></pre></div>
+  </div>
+</section>
+
+<section class="w" id="endpoints">
+  <h2>What it does, endpoint by endpoint.</h2>
+  <p class="lead">Taken from the live OpenAPI schema. Each row opens the interactive docs.</p>
+  <div class="led">
+    <a class="row" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener"><span class="m get">GET</span><code>/api/v1/profiles/blank_profile/</code><span class="d">Start from an empty profile template.</span><span class="a">public</span></a>
+    <a class="row" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener"><span class="m">POST</span><code>/api/v1/profiles/</code><span class="d">Define a game system as a profile.</span><span class="a">bearer token</span></a>
+    <a class="row" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener"><span class="m get">GET</span><code>/api/v1/profiles/{system_id}/sheet/</code><span class="d">Generate a character sheet from that profile.</span><span class="a">optional auth</span></a>
+    <a class="row" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener"><span class="m">POST</span><code>/api/v1/dice/rolls/base/</code><span class="d">Roll XdY with kh, kl and ! operators.</span><span class="a">public</span></a>
+    <a class="row" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener"><span class="m get">GET</span><code>/api/v1/profiles/</code><span class="d">List official profiles, plus your own when signed in.</span><span class="a">optional auth</span></a>
+    <a class="row" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener"><span class="m">POST</span><code>/api/v1/auth/jwt/create/</code><span class="d">Sign in and receive access and refresh tokens.</span><span class="a">public</span></a>
+  </div>
+</section>
+
+<section class="w" id="tabs">
+  <div class="tl" role="tablist" aria-label="Project details">
+    <button role="tab" id="t-feat" aria-controls="p-feat" aria-selected="true">Features</button>
+    <button role="tab" id="t-stack" aria-controls="p-stack" aria-selected="false" tabindex="-1">Tech Stack</button>
+  </div>
+  <div id="p-feat" role="tabpanel" aria-labelledby="t-feat">
+    <ul class="fg">
+      <li><h3>Dynamic schemas</h3><p>Shape each system's sheet with <code>added_fields</code>, <code>field_overrides</code> and <code>custom_schema</code>.</p></li>
+      <li><h3>Dice engine</h3><p>XdY notation, <code>kh</code>, <code>kl</code> and <code>!</code> operators, modifiers, critical and fumble flags.</p></li>
+      <li><h3>JWT authentication</h3><p>Registration, login, token refresh and password reset through djoser and simplejwt.</p></li>
+      <li><h3>Official and private profiles</h3><p>Staff publish official systems for everyone. Every other profile stays private to its owner.</p></li>
+      <li><h3>Interactive docs</h3><p>OpenAPI 3.0 with Swagger UI and Redoc, with a JWT Authorize button for protected routes.</p></li>
+      <li><h3>Tested</h3><p>73 unit and integration tests with pytest and factory-boy, achieving 95% coverage.</p></li>
+    </ul>
+  </div>
+  <div id="p-stack" role="tabpanel" aria-labelledby="t-stack" hidden>
+    <dl class="st">
+      <div><dt>Language and framework</dt><dd>Python 3.12 · Django 6.0 · Django REST Framework</dd></div>
+      <div><dt>Auth</dt><dd>djoser · djangorestframework-simplejwt</dd></div>
+      <div><dt>Data</dt><dd>PostgreSQL · Redis cache and rate limiting</dd></div>
+      <div><dt>API contract</dt><dd>drf-spectacular · OpenAPI 3.0</dd></div>
+      <div><dt>Quality</dt><dd>pytest · pytest-django · factory-boy · faker</dd></div>
+      <div><dt>Shipping</dt><dd>Docker · Docker Compose · Gunicorn · Whitenoise · GitHub Actions (CI/CD) · GHCR · Railway</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="w close">
+  <h2>Pick an endpoint.<br>Send a request.</h2>
+  <div class="acts">
+    <a class="btn p" href="https://neo-sheet.up.railway.app/" target="_blank" rel="noopener">Explore the API <span aria-hidden="true">→</span></a>
+    <a class="btn" href="https://neo-sheet.up.railway.app/api/v1/schema/redoc" target="_blank" rel="noopener">Read the docs</a>
+    <a class="btn" href="https://github.com/matheusmessiasdev/neo-sheet" target="_blank" rel="noopener">View on GitHub <span aria-hidden="true">↗</span></a>
+  </div>
+</section>
+</main>
+<footer class="w"><span>Neo-Sheet · MIT License</span><span>Built by <a href="https://www.linkedin.com/in/matheusmessiasdev/" target="_blank" rel="noopener">Matheus Messias</a></span></footer>
+
+<script>
+const SP={
+wiz1:["....#......","...###.....","...###.....","..aaaaa....",".#########.","...#####...","...#.#.#...","..#######..",".#########.",".#########.",".#########.","..#######..","..##...##..",".###...###."],
+wiz2:["....#......","...###.....","...###.....","..aaaaa....",".#########.","...#####...","...#.#.#...","..#######..",".#########.",".#########.",".#########.","..#######..","...##.##...","...##.##..."],
+d20:["....###....","..##...##..",".#...a...#.","##..a.a..##","#..a...a..#","#.aaaaaaa.#","#...a.a...#","##..a.a..##",".#...a...#.","..##...##..","....###...."],
+schema:[".##...##.",".#.....#.","##.aaa.##",".#.....#.",".##...##."],
+sheet:["#######","#aaaaa#","#.....#","#.###.#","#.....#","#.###.#","#.....#","#######"]};
+document.querySelectorAll('[data-sp]').forEach(e=>{const g=SP[e.dataset.sp],p=+e.dataset.px;let r='';g.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!='.')r+=`<rect x="${x}" y="${y}" width="1" height="1"${c=='a'?' class="a"':''}/>`}));e.innerHTML=`<svg viewBox="0 0 ${g[0].length} ${g.length}" width="${g[0].length*p}" height="${g.length*p}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`});
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function pick(t){tabs.forEach(b=>{const on=b===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;document.getElementById(b.getAttribute('aria-controls')).hidden=!on})}
+tabs.forEach((b,i)=>{b.onclick=()=>pick(b);b.onkeydown=e=>{if(e.key=='ArrowRight'||e.key=='ArrowLeft'){const n=tabs[(i+(e.key=='ArrowRight'?1:tabs.length-1))%tabs.length];pick(n);n.focus()}}});
+document.querySelectorAll('[data-tab]').forEach(a=>a.addEventListener('click',()=>pick(document.getElementById(a.dataset.tab))));
+const S={
+dnd:{id:'dnd5e',n:'D&amp;D 5e',o:true,f:[['Strength','10'],['Dexterity','10'],['Constitution','10'],['Intelligence','10'],['Wisdom','10'],['Charisma','10'],['Proficiency bonus','+2'],['Spell slots','0']]},
+ordem:{id:'ordem_paranormal',n:'Paranormal Order',o:true,f:[['Agility','1'],['Intellect','1'],['Vigor','1'],['Presence','1'],['Strength','1'],['Sanity','20'],['Effort points','4'],['Hit points','12']]},
+home:{id:'ashen_road',n:'Homebrew: Ashen Road',o:false,f:[['Grit','3'],['Luck','1'],['Corruption','0'],['Gold','25'],['Scars','none']]}};
+const sys=document.querySelector('.sys'),js=document.getElementById('js'),sh=document.getElementById('sh');
+Object.entries(S).forEach(([k,s],i)=>{const b=document.createElement('button');b.innerHTML=s.n.replace('Homebrew: ','Homebrew · ');b.setAttribute('aria-pressed',i==0);b.onclick=()=>show(k,b);sys.append(b)});
+function show(k,btn){const s=S[k];sys.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===btn));
+js.innerHTML=`{\n  "system_id": "${s.id}",\n  "display_name": "${s.n}",\n  "is_official": ${s.o},\n  "schemas": {\n    "added_fields": [\n${s.f.map(f=>`      <b>"${f[0].toLowerCase().replace(/ /g,'_')}"</b>`).join(',\n')}\n    ]\n  }\n}`;
+sh.innerHTML=`<h3>${s.n}<small>blank sheet</small></h3>`+s.f.map((f,i)=>`<div class="r" style="--i:${i}"><span>${f[0]}</span><span class="v">${f[1]}</span></div>`).join('')}
+show('dnd',sys.firstChild);
+
+const $=id=>document.getElementById(id),diceEl=$('dice'),out=$('out'),fx=$('fx');let busy=false;
+const RE=/^(\d+)?d(\d+)([a-z!]*)(\d+)?((?:[+-]\d+)*)$/,rnd=n=>1+Math.floor(Math.random()*n);
+function parse(t){const f=t.replace(/\s/g,''),m=RE.exec(f);if(!m)return{err:`Invalid Formula: ${f}. Use the XdY+modifier format. Ex: 3d6+5`};
+const n=m[1]===undefined?1:+m[1],s=+m[2];
+if(!['kh','kl','!',''].includes(m[3]))return{err:'Unknown Operator. Use the specified formats kh, kl, !'};
+if(n>999)return{err:`999 dice max per roll. Received: ${n}`};
+if(s<1||s>100000)return{err:`d${s} is a invalid die.`};
+if(n<1||n>40)return{err:'This demo draws 1 to 40 dice. The API accepts up to 999.'};
+return{f,n,s,op:m[3],k:m[4],mod:(m[5].match(/[+-]\d+/g)||[]).reduce((a,b)=>a+ +b,0)}}
+function roll(p){const rolls=Array.from({length:p.n},()=>rnd(p.s));let fin=rolls,exp=[];
+if(p.op=='kh'||p.op=='kl'){const s=[...rolls].sort((a,b)=>p.op=='kh'?b-a:a-b);fin=(!p.k||p.k=='1')?[s[0]]:(+p.k>1?s.slice(0,+p.k):rolls)}
+if(p.op=='!'){exp=rolls.filter(v=>v==p.s).map(()=>rnd(p.s));fin=[...exp,...rolls]}
+const mx=Math.max(...rolls),total=fin.reduce((a,b)=>a+b,0),pool=[...fin];
+const tiles=rolls.map(v=>{const i=pool.indexOf(v);if(i>-1)pool.splice(i,1);return{v,x:i<0,c:v>=p.s}}).concat(exp.map(v=>({v,e:true,c:v>=p.s})));
+return{tiles,res:{dice_notation:p.f,rolls,rolls_final:fin,is_critical:mx>=p.s,is_fumble:mx<=1,total,modifier:p.mod,total_with_modifier:total+p.mod,context:{dice:p.n,faces:p.s,critical_value:p.s,critical_mult:1,dropped_dice:0}}}}
+function paint(t,tm){diceEl.innerHTML=t.map(d=>`<span class="dd${d.x?' x':''}${d.e?' e':''}${d.c&&!tm?' c':''}${tm?' t':''}">${d.v}</span>`).join('')}
+function send(){if(busy)return;const p=parse(fx.value);
+if(p.err){diceEl.innerHTML='';out.textContent='422 Unprocessable Entity\n'+JSON.stringify({formula:[p.err]},null,2);return}
+busy=true;let i=0;const iv=setInterval(()=>{paint(Array.from({length:p.n},()=>({v:rnd(p.s)})),true);if(++i>7){clearInterval(iv);const x=roll(p);paint(x.tiles,false);
+const j=JSON.stringify(x.res,null,2).replace(/\[\s+([^\]]*?)\s+\]/g,(m,a)=>'['+a.replace(/\s+/g,' ')+']').replace(/"(is_critical|is_fumble)": true/g,'"$1": <b>true</b>');
+out.innerHTML='200 OK\n'+j;busy=false}},70)}
+$('f').onsubmit=e=>{e.preventDefault();send()};
+document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{fx.value=b.textContent;send()});
+send();
+
+(()=>{const rail=$('rail'),wk=$('w'),core=$('core'),bub=$('bub'),pop=$('pop'),cap=$('cap'),L=120,lerp=(a,b,p)=>a+(b-a)*p,HOP=[0,14,26,30,26,14,0,0];
+function pose(n){const W=rail.clientWidth,cx=W/2,stop=cx-112,end=W-59;let x=0,y=0,fr=(n>>1)%2,item=1,op=n<3?.4:1,work=n>=58&&n<83,txt='',pp=null;
+if(n<53)x=lerp(0,stop,n/52);
+else if(n<83){x=stop;fr=0;if(n<61)y=-HOP[n-53]}
+else{x=lerp(stop,end,Math.min(1,(n-83)/30));item=2;if(n>=114)op=n%2?0:1;if(n>=118)op=0}
+if(work)txt=n<71?'GET /sheet/':'200 OK';
+if(n>=71&&n<83){const p=(n-71)/11,e=1-Math.pow(1-p,3);pp={x:lerp(cx-14,stop+46,e),y:lerp(-60,-18,e)-12*Math.sin(Math.PI*p)}}
+wk.style.transform=`translate(${x}px,${y}px)`;wk.style.opacity=op;wk.className='walker'+(fr?' s2':'')+(item==2?' h2':' h1');
+core.className='core'+(work?' work':'')+(work&&n%2?' j':'');core.style.transform=(n==57||n==58)?'translateY(-8px)':work?`translateX(${n%2?2:-2}px)`:'';
+bub.textContent=txt;bub.className='bub'+(txt?' on':'');cap.className='cap'+(work?' work':'')+(n>=108&&n<118?' end':'');
+pop.style.visibility=pp?'visible':'hidden';if(pp)pop.style.transform=`translate(${pp.x}px,${pp.y}px)`}
+let n=0,t=null;const go=()=>{if(!t)t=setInterval(()=>{pose(n);n=(n+1)%L},100)},stopT=()=>{clearInterval(t);t=null};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){pose(76);addEventListener('resize',()=>pose(76))}
+else{let vis=true;new IntersectionObserver(e=>{vis=e[0].isIntersecting;vis&&!document.hidden?go():stopT()}).observe($('stage'));document.addEventListener('visibilitychange',()=>document.hidden?stopT():vis&&go())}
+window.__pose=pose})();
+</script>
+</body>
+</html>
