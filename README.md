@@ -13,14 +13,14 @@
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)](./LICENSE)
 
-[Quick Start](#-quick-start) · [Features](#-features) · [Tech Stack](#%EF%B8%8F-tech-stack) · [Roadmap](#%EF%B8%8F-roadmap) · [Docs](#-documentation)
+[Landing Page](https://matheusmessiasdev.github.io/neo-sheet/) · [Live API](https://neo-sheet.up.railway.app/) · [Docs](https://neo-sheet.up.railway.app/api/v1/schema/swagger-ui/) ·
+[Quick Start](#-quick-start) · [Features](#-features) · [Tech Stack](#%EF%B8%8F-tech-stack) · [Roadmap](#%EF%B8%8F-roadmap)
 
-<!-- Replace with a real preview: Swagger UI screenshot or a GIF of the API in action -->
-<!-- ![Neo-Sheet Preview](docs/preview.gif) -->
+![Neo-Sheet Preview](docs/preview.gif)
 
 </div>
 
----
+
 
 ##  Concept
 
@@ -28,7 +28,7 @@
 
 Instead of hardcoding attributes, statuses, and inventory structures, the API exposes a flexible **profile system**. A "profile" describes how a character sheet should look (fields, overrides, custom schemas). Clients then use these profiles to generate character sheets at runtime. The core API stays stack-agnostic, validated, and easy to extend.
 
----
+
 
 ##  Features
 
@@ -38,13 +38,12 @@ Instead of hardcoding attributes, statuses, and inventory structures, the API ex
 |  **User & Auth Management** | Full registration, login, token refresh, password reset, and profile endpoints powered by `djoser` + `simplejwt`. |
 |  **JWT Authentication** | Stateless authentication with `Bearer` tokens and configurable lifetimes. |
 |  **Profile CRUD** | Create, list, retrieve, update, and delete system profiles with owner-based permissions. |
-|  **Granular Permissions** | Public, optional-auth, and protected endpoints — reflected accurately in the OpenAPI schema. |
+|  **Granular Permissions** | Public, optional-auth, and protected endpoints, reflected accurately in the OpenAPI schema. |
 |  **Dice Engine** | Roll `XdY` notation with advanced operators (`kh`, `kl`, `!`) and modifiers. |
 |  **Official vs. Private Profiles** | Staff-created official profiles are visible to everyone; user profiles stay private. |
 |  **Interactive Docs** | Auto-generated OpenAPI 3.0 schema with Swagger UI and Redoc. |
-|  **Tests** | Unit + integration tests with `pytest`, `factory-boy`, and a coverage target of 85%+. |
+|  **Tests** | Unit + integration tests with `pytest`, `factory-boy`, and a coverage target of 95%+. |
 
----
 
 ## Quick Start
 
@@ -70,27 +69,36 @@ Create a `.env` file in the project root:
 SECRET_KEY=replace-me-with-a-long-random-string
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
-DATABASE_URL=sqlite:///db.sqlite3
-# For production (PostgreSQL + Redis):
-# DATABASE_URL=postgres://user:password@db:5432/neo_sheet
-# REDIS_URL=redis://redis:6379/0
+DATABASE_URL=postgres://user:password@db:5432/neo_sheet
+REDIS_URL=redis://redis:6379/0
 EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 ```
 
 </details>
-
 <details>
-<summary>🐳 Running with Docker (coming soon)</summary>
+<summary>🐳 Running with Docker</summary>
 
-A `docker-compose.yml` will be added in the next milestone. It will spin up:
+The project ships with a `docker-compose.yml` that spins up:
 
-- `web` — Django + Gunicorn
-- `db` — PostgreSQL 15
-- `redis` — Cache and rate limiting
+- `web` - Django + Gunicorn
+- `db`- PostgreSQL 15
+- `redis` - Cache and rate limiting
 
-</details>
+```bash
+# Start all services
+docker compose up -d --build
 
----
+# Apply migrations
+docker compose exec web python manage.py migrate
+
+# Create a superuser
+docker compose exec web python manage.py createsuperuser
+
+The API will be available at http://localhost:8000.
+```
+</details> 
+
+
 
 ##  Tech Stack
 
@@ -100,11 +108,14 @@ A `docker-compose.yml` will be added in the next milestone. It will spin up:
 | **Framework** | Django 6.0 + Django REST Framework |
 | **Auth** | `djoser` + `djangorestframework-simplejwt` |
 | **Docs** | `drf-spectacular` (OpenAPI 3.0) |
-| **Database** | SQLite (dev) · PostgreSQL (planned) |
-| **Cache** | Redis (planned) |
+| **Database** | PostgreSQL 15|
+| **Cache** | Redis |
 | **Testing** | `pytest`, `pytest-django`, `factory-boy`, `faker` |
-| **Containerization** | Docker + Docker Compose (planned) |
-| **CI/CD** | GitHub Actions (planned) |
+| **Containerization** | Docker + Docker Compose |
+| **Production server** | Gunicorn |
+| **Static files** | Whitenoise |
+| **Container registry** | GHCR |
+| **Deployment** | Railway |
 
 <details>
 <summary>📂 Project structure</summary>
@@ -129,15 +140,21 @@ neo-sheet/
 
 </details>
 
----
+
 
 ##  Documentation
 
 The API ships with **interactive, always-up-to-date documentation**:
 
--  **Swagger UI** - `http://localhost:8000/api/v1/schema/swagger-ui/`
--  **Redoc** - `http://localhost:8000/api/v1/schema/redoc`
--  **Raw OpenAPI 3.0 schema** - `http://localhost:8000/api/v1/schema/`
+-  **Swagger UI** - `https://neo-sheet.up.railway.app/api/v1/schema/swagger-ui/`
+-  **Redoc** - `https://neo-sheet.up.railway.app/api/v1/schema/redoc`
+-  **Landing Page** - `https://matheusmessiasdev.github.io/neo-sheet/`
+-  **Raw OpenAPI 3.0 schema** - `https://neo-sheet.up.railway.app/api/v1/schema/`
+
+### Local
+
+- Swagger UI - `http://localhost:8000/api/v1/schema/swagger-ui/`
+- Redoc - `http://localhost:8000/api/v1/schema/redoc`
 
 > [!NOTE]
 > The docs include the JWT `Authorize` button. Use `Bearer <access_token>` to try protected endpoints directly from the browser.
