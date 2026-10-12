@@ -9,7 +9,7 @@ base_fields_and_label.append('label')
 
 
 def configure_sheet_from_profile(profile: ProfileModel):
-    sheet = BASE_SCHEMA_DEFAULTS
+    sheet = deepcopy(BASE_SCHEMA_DEFAULTS)
     profile_schemas = profile.schemas
     profile_schemas_keys = profile_schemas.keys()
     is_field_a_list = False
